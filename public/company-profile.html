@@ -83,7 +83,8 @@
             <p>Configure your ZUS (Social Security) contribution rates and amounts.</p>
 
             <div class="zus-settings-container">
-              <div class="zus-settings-column">
+              <!-- Left Column - All Input Fields -->
+              <div class="zus-settings-column inputs-column">
                 <div class="zus-settings-card">
                   <h4>Base Settings</h4>
                   <div class="form-group">
@@ -142,12 +143,7 @@
                     </div>
                     <small>Default: 0.1%</small>
                   </div>
-                </div>
-              </div>
 
-              <div class="zus-settings-column">
-                <div class="zus-settings-card">
-                  <h4>Optional Insurance</h4>
                   <div class="form-group">
                     <label for="zus_sickness_rate">Sickness Insurance Rate (%) - Optional</label>
                     <div class="input-with-reset">
@@ -179,19 +175,22 @@
                     </div>
                     <small>Enter a fixed amount, or leave as 0 to use the amount based on income threshold</small>
                   </div>
-                </div>
 
-                <div class="zus-settings-card">
+                  <div class="button-row">
+                    <button type="button" id="reset-all-zus" class="btn secondary-btn">Reset All to Defaults</button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Right Column - Calculations -->
+              <div class="zus-settings-column results-column">
+                <div class="zus-settings-card calculation-card">
                   <h4>Calculated Monthly Contributions</h4>
                   <div id="zus-calculation-results" class="calculation-results">
                     <!-- Results will be displayed here -->
                   </div>
                 </div>
               </div>
-            </div>
-
-            <div class="button-row">
-              <button type="button" id="reset-all-zus" class="btn secondary-btn">Reset All to Defaults</button>
             </div>
           </div>
 
@@ -258,11 +257,26 @@
         }
 
         .zus-settings-column {
-          flex: 1;
-          min-width: 300px;
           display: flex;
           flex-direction: column;
           gap: 20px;
+        }
+
+        .inputs-column {
+          flex: 3;
+          min-width: 300px;
+        }
+
+        .results-column {
+          flex: 2;
+          min-width: 250px;
+        }
+
+        .calculation-card {
+          position: sticky;
+          top: 20px;
+          max-height: calc(100vh - 40px);
+          overflow-y: auto;
         }
 
         .zus-settings-card {
@@ -329,19 +343,31 @@
         .calculation-results table {
           width: 100%;
           border-collapse: collapse;
+          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         }
 
         .calculation-results table tr:nth-child(even) {
           background-color: #f2f2f2;
         }
 
+        .calculation-results table tr:hover {
+          background-color: #e9ecef;
+        }
+
         .calculation-results table tr:last-child {
           font-weight: bold;
-          border-top: 1px solid #ddd;
+          border-top: 2px solid #007bff;
+          background-color: #e7f5ff;
         }
 
         .calculation-results table td {
-          padding: 8px;
+          padding: 10px;
+          border-bottom: 1px solid #dee2e6;
+        }
+
+        .calculation-results table td:last-child {
+          font-family: monospace;
+          font-size: 1.1em;
         }
 
         .button-row {
