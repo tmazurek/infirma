@@ -59,6 +59,199 @@
     .disclaimer h3 {
       margin-top: 0;
     }
+
+    /* Payment Notice Styles */
+    .payment-notice {
+      background-color: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      margin: 20px 0;
+      overflow: hidden;
+      border: 1px solid #e0e0e0;
+    }
+
+    .payment-notice-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px;
+      background-color: #f8f9fa;
+      border-bottom: 1px solid #e0e0e0;
+    }
+
+    .payment-notice-title h3 {
+      margin: 0 0 10px 0;
+      color: #333;
+      font-size: 1.2rem;
+    }
+
+    .payment-total {
+      font-size: 1.8rem;
+      font-weight: bold;
+      color: #333;
+    }
+
+    .payment-notice-action {
+      display: flex;
+      align-items: center;
+    }
+
+    .pay-btn {
+      background-color: #28a745;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      font-weight: bold;
+    }
+
+    .pay-btn:hover {
+      background-color: #218838;
+    }
+
+    .payment-notice-info {
+      padding: 15px 20px;
+      background-color: #e7f5ff;
+      color: #0c5460;
+      font-size: 0.9rem;
+      border-bottom: 1px solid #bee5eb;
+    }
+
+    .payment-details {
+      padding: 0;
+    }
+
+    .payment-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 20px;
+      border-bottom: 1px solid #e0e0e0;
+    }
+
+    .payment-item:last-child {
+      border-bottom: none;
+    }
+
+    .payment-item-left {
+      flex: 1;
+    }
+
+    .payment-item-title {
+      font-weight: bold;
+      margin-bottom: 5px;
+      display: flex;
+      align-items: center;
+    }
+
+    .payment-period {
+      font-size: 0.8rem;
+      color: #6c757d;
+      margin-left: 10px;
+      padding: 2px 8px;
+      background-color: #f8f9fa;
+      border-radius: 10px;
+    }
+
+    .payment-item-details {
+      font-size: 0.9rem;
+      color: #6c757d;
+    }
+
+    .payment-item-amount {
+      font-size: 1.2rem;
+      font-weight: bold;
+      margin: 0 20px;
+      min-width: 120px;
+      text-align: right;
+    }
+
+    .payment-item-deadline {
+      font-size: 0.8rem;
+      color: #dc3545;
+      margin-right: 20px;
+      white-space: nowrap;
+    }
+
+    .payment-item-action {
+      display: flex;
+      align-items: center;
+    }
+
+    .payment-item-action .btn {
+      padding: 5px 15px;
+      font-size: 0.9rem;
+    }
+
+    .payment-breakdown {
+      padding: 10px 20px;
+      background-color: #f8f9fa;
+      font-size: 0.9rem;
+    }
+
+    .payment-breakdown-item {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 5px;
+    }
+
+    .status-badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-size: 0.8rem;
+      margin-left: 10px;
+    }
+
+    .status-pending {
+      background-color: #fff3cd;
+      color: #856404;
+    }
+
+    .status-paid {
+      background-color: #d4edda;
+      color: #155724;
+    }
+
+    .status-sent {
+      background-color: #d1ecf1;
+      color: #0c5460;
+    }
+
+    @media (max-width: 768px) {
+      .payment-notice-header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .payment-notice-action {
+        margin-top: 15px;
+        width: 100%;
+      }
+
+      .payment-notice-action .btn {
+        width: 100%;
+      }
+
+      .payment-item {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .payment-item-amount {
+        margin: 10px 0;
+        text-align: left;
+      }
+
+      .payment-item-deadline {
+        margin: 5px 0;
+      }
+
+      .payment-item-action {
+        width: 100%;
+        justify-content: space-between;
+        margin-top: 10px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -112,6 +305,30 @@
         </div>
 
         <button id="generate-btn" class="btn">Generate Summary</button>
+      </div>
+
+      <!-- Payment Notice Section (similar to inFakt) -->
+      <div id="payment-notice" class="payment-notice" style="display: none;">
+        <div class="payment-notice-header">
+          <div class="payment-notice-title">
+            <h3>Total payments for <span id="payment-month-year">April 2025</span></h3>
+            <div class="payment-total">
+              <span id="payment-total-amount">0.00 PLN</span>
+            </div>
+          </div>
+          <div class="payment-notice-action">
+            <button id="pay-all-btn" class="btn pay-btn">Pay All</button>
+          </div>
+        </div>
+        <div class="payment-notice-info">
+          Pay all outstanding taxes and contributions in one transfer.
+          <br>
+          <strong>NOTE:</strong> To pay more than 4,300.00 PLN, you need to verify your account.
+        </div>
+
+        <div id="payment-details" class="payment-details">
+          <!-- Payment details will be populated dynamically -->
+        </div>
       </div>
 
       <div id="summary-container" class="summary-container">
@@ -308,6 +525,172 @@
 
         // Show summary container
         summaryContainer.style.display = 'block';
+
+        // Populate and show payment notice
+        populatePaymentNotice(data, monthSelect.value, yearSelect.value);
+      }
+
+      // Function to populate payment notice
+      function populatePaymentNotice(data, month, year) {
+        const paymentNotice = document.getElementById('payment-notice');
+        const paymentDetails = document.getElementById('payment-details');
+        const paymentMonthYear = document.getElementById('payment-month-year');
+        const paymentTotalAmount = document.getElementById('payment-total-amount');
+
+        // Format currency without "PLN" for calculations
+        const formatCurrencyValue = (value) => {
+          return parseFloat(value).toFixed(2);
+        };
+
+        // Format currency with "PLN" for display
+        const formatCurrency = (value) => {
+          return parseFloat(value).toFixed(2) + ' PLN';
+        };
+
+        // Get month name
+        const monthNames = [
+          'January', 'February', 'March', 'April', 'May', 'June',
+          'July', 'August', 'September', 'October', 'November', 'December'
+        ];
+        const monthName = monthNames[parseInt(month) - 1];
+
+        // Set month and year in the header
+        paymentMonthYear.textContent = `${monthName} ${year}`;
+
+        // Set total amount
+        paymentTotalAmount.textContent = formatCurrency(data.total_tax_burden);
+
+        // Calculate payment deadlines
+        const currentDate = new Date(year, month - 1, 1);
+
+        // ZUS deadline: 20th of the current month
+        const zusDeadline = new Date(currentDate);
+        zusDeadline.setDate(20);
+
+        // PIT deadline: 20th of the next month
+        const pitDeadline = new Date(currentDate);
+        pitDeadline.setMonth(pitDeadline.getMonth() + 1);
+        pitDeadline.setDate(20);
+
+        // VAT deadline: 25th of the next month
+        const vatDeadline = new Date(currentDate);
+        vatDeadline.setMonth(vatDeadline.getMonth() + 1);
+        vatDeadline.setDate(25);
+
+        // Format date
+        const formatDate = (date) => {
+          return date.getDate() + ' ' + monthNames[date.getMonth()] + ' ' + date.getFullYear();
+        };
+
+        // Clear previous payment details
+        paymentDetails.innerHTML = '';
+
+        // Add ZUS payment item
+        if (data.zus.total > 0) {
+          const zusTotal = formatCurrencyValue(data.zus.total);
+          const socialInsurance = formatCurrencyValue(
+            data.zus.social_insurance.retirement +
+            data.zus.social_insurance.disability +
+            data.zus.social_insurance.sickness +
+            data.zus.social_insurance.accident +
+            data.zus.social_insurance.labor_fund +
+            data.zus.social_insurance.fep
+          );
+          const healthInsurance = formatCurrencyValue(data.zus.health_insurance);
+
+          const zusItem = document.createElement('div');
+          zusItem.className = 'payment-item';
+          zusItem.innerHTML = `
+            <div class="payment-item-left">
+              <div class="payment-item-title">
+                ZUS Contributions <span class="payment-period">${monthName} ${year}</span>
+              </div>
+              <div class="payment-item-details">
+                <div class="payment-breakdown">
+                  <div class="payment-breakdown-item">
+                    <span>Social Insurance:</span>
+                    <span>${socialInsurance} PLN</span>
+                  </div>
+                  <div class="payment-breakdown-item">
+                    <span>Health Insurance:</span>
+                    <span>${healthInsurance} PLN</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="payment-item-amount">${zusTotal} PLN</div>
+            <div class="payment-item-deadline">Due: ${formatDate(zusDeadline)}</div>
+            <div class="payment-item-action">
+              <button class="btn pay-btn">Pay Now</button>
+            </div>
+          `;
+          paymentDetails.appendChild(zusItem);
+        }
+
+        // Add PIT payment item
+        if (data.pit.income_tax > 0) {
+          const pitItem = document.createElement('div');
+          pitItem.className = 'payment-item';
+          pitItem.innerHTML = `
+            <div class="payment-item-left">
+              <div class="payment-item-title">
+                Income Tax (Ryczałt) <span class="payment-period">${monthName} ${year}</span>
+              </div>
+              <div class="payment-item-details">
+                Taxable income: ${formatCurrency(data.pit.taxable_income)} × ${(data.pit.income_tax_rate * 100)}% rate
+              </div>
+            </div>
+            <div class="payment-item-amount">${formatCurrency(data.pit.income_tax)}</div>
+            <div class="payment-item-deadline">Due: ${formatDate(pitDeadline)}</div>
+            <div class="payment-item-action">
+              <button class="btn pay-btn">Pay Now</button>
+            </div>
+          `;
+          paymentDetails.appendChild(pitItem);
+        }
+
+        // Add VAT payment item
+        if (data.vat.vat_due > 0) {
+          const vatItem = document.createElement('div');
+          vatItem.className = 'payment-item';
+          vatItem.innerHTML = `
+            <div class="payment-item-left">
+              <div class="payment-item-title">
+                VAT <span class="payment-period">${monthName} ${year}</span>
+              </div>
+              <div class="payment-item-details">
+                <div class="payment-breakdown">
+                  <div class="payment-breakdown-item">
+                    <span>VAT Collected:</span>
+                    <span>${formatCurrency(data.vat.vat_collected)}</span>
+                  </div>
+                  <div class="payment-breakdown-item">
+                    <span>VAT Paid:</span>
+                    <span>${formatCurrency(data.vat.vat_paid)}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="payment-item-amount">${formatCurrency(data.vat.vat_due)}</div>
+            <div class="payment-item-deadline">Due: ${formatDate(vatDeadline)}</div>
+            <div class="payment-item-action">
+              <button class="btn pay-btn">Pay Now</button>
+            </div>
+          `;
+          paymentDetails.appendChild(vatItem);
+        }
+
+        // Show payment notice
+        paymentNotice.style.display = 'block';
+
+        // Add event listeners to pay buttons
+        const payButtons = document.querySelectorAll('.pay-btn');
+        payButtons.forEach(button => {
+          button.addEventListener('click', function(e) {
+            e.preventDefault();
+            alert('Payment functionality will be implemented in a future update.');
+          });
+        });
       }
 
       // Function to show messages
