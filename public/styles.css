@@ -256,6 +256,8 @@ tr:hover {
   align-items: center;
   gap: 5px;
   transition: all 0.2s ease;
+  text-decoration: none;
+  color: inherit;
 }
 
 .action-button:hover {
