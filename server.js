@@ -3,6 +3,9 @@ const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Import database migration script
+const migrateDatabase = require('./utils/migrateDatabase');
+
 // Import routes
 const companyProfileRoutes = require('./routes/companyProfile');
 const clientsRoutes = require('./routes/clients');
