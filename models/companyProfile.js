@@ -97,7 +97,7 @@ class CompanyProfile {
             zus_fep_rate,
             zus_health_insurance_amount,
             zus_health_insurance_income_threshold
-          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         `;
 
         const params = [
