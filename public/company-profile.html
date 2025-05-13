@@ -82,69 +82,116 @@
             <h3>ZUS Contribution Settings</h3>
             <p>Configure your ZUS (Social Security) contribution rates and amounts.</p>
 
-            <div class="form-group">
-              <label for="zus_base_amount">Base Amount (PLN)</label>
-              <input type="number" id="zus_base_amount" name="zus_base_amount" min="0" step="0.01" value="5203.80">
-              <small>The base amount used for calculating ZUS contributions (e.g., 5203.80 PLN for 2025)</small>
-            </div>
+            <div class="zus-settings-container">
+              <div class="zus-settings-column">
+                <div class="zus-settings-card">
+                  <h4>Base Settings</h4>
+                  <div class="form-group">
+                    <label for="zus_base_amount">Base Amount (PLN)</label>
+                    <div class="input-with-reset">
+                      <input type="number" id="zus_base_amount" name="zus_base_amount" min="0" step="0.01" value="5203.80">
+                      <button type="button" class="reset-btn" data-field="zus_base_amount" data-default="5203.80">Reset</button>
+                    </div>
+                    <small>The base amount used for calculating ZUS contributions (e.g., 5203.80 PLN for 2025)</small>
+                  </div>
+                </div>
 
-            <div class="form-group">
-              <label for="zus_retirement_rate">Retirement Insurance Rate (%)</label>
-              <input type="number" id="zus_retirement_rate" name="zus_retirement_rate" min="0" max="100" step="0.01" value="19.52">
-              <small>Default: 19.52%</small>
-            </div>
+                <div class="zus-settings-card">
+                  <h4>Mandatory Insurance</h4>
+                  <div class="form-group">
+                    <label for="zus_retirement_rate">Retirement Insurance Rate (%)</label>
+                    <div class="input-with-reset">
+                      <input type="number" id="zus_retirement_rate" name="zus_retirement_rate" min="0" max="100" step="0.01" value="19.52">
+                      <button type="button" class="reset-btn" data-field="zus_retirement_rate" data-default="19.52">Reset</button>
+                    </div>
+                    <small>Default: 19.52%</small>
+                  </div>
 
-            <div class="form-group">
-              <label for="zus_disability_rate">Disability Insurance Rate (%)</label>
-              <input type="number" id="zus_disability_rate" name="zus_disability_rate" min="0" max="100" step="0.01" value="8.0">
-              <small>Default: 8.0%</small>
-            </div>
+                  <div class="form-group">
+                    <label for="zus_disability_rate">Disability Insurance Rate (%)</label>
+                    <div class="input-with-reset">
+                      <input type="number" id="zus_disability_rate" name="zus_disability_rate" min="0" max="100" step="0.01" value="8.0">
+                      <button type="button" class="reset-btn" data-field="zus_disability_rate" data-default="8.0">Reset</button>
+                    </div>
+                    <small>Default: 8.0%</small>
+                  </div>
 
-            <div class="form-group">
-              <label for="zus_accident_rate">Accident Insurance Rate (%)</label>
-              <input type="number" id="zus_accident_rate" name="zus_accident_rate" min="0" max="100" step="0.01" value="1.67">
-              <small>Default: 1.67%</small>
-            </div>
+                  <div class="form-group">
+                    <label for="zus_accident_rate">Accident Insurance Rate (%)</label>
+                    <div class="input-with-reset">
+                      <input type="number" id="zus_accident_rate" name="zus_accident_rate" min="0" max="100" step="0.01" value="1.67">
+                      <button type="button" class="reset-btn" data-field="zus_accident_rate" data-default="1.67">Reset</button>
+                    </div>
+                    <small>Default: 1.67%</small>
+                  </div>
 
-            <div class="form-group">
-              <label for="zus_sickness_rate">Sickness Insurance Rate (%) - Optional</label>
-              <input type="number" id="zus_sickness_rate" name="zus_sickness_rate" min="0" max="100" step="0.01" value="2.45">
-              <small>Default: 2.45% - This insurance is voluntary, set to 0 if you don't want it</small>
-            </div>
+                  <div class="form-group">
+                    <label for="zus_labor_fund_rate">Labor Fund Rate (%)</label>
+                    <div class="input-with-reset">
+                      <input type="number" id="zus_labor_fund_rate" name="zus_labor_fund_rate" min="0" max="100" step="0.01" value="2.45">
+                      <button type="button" class="reset-btn" data-field="zus_labor_fund_rate" data-default="2.45">Reset</button>
+                    </div>
+                    <small>Default: 2.45%</small>
+                  </div>
 
-            <div class="form-group">
-              <label for="zus_labor_fund_rate">Labor Fund Rate (%)</label>
-              <input type="number" id="zus_labor_fund_rate" name="zus_labor_fund_rate" min="0" max="100" step="0.01" value="2.45">
-              <small>Default: 2.45%</small>
-            </div>
-
-            <div class="form-group">
-              <label for="zus_fep_rate">FEP (Bridging Pensions Fund) Rate (%)</label>
-              <input type="number" id="zus_fep_rate" name="zus_fep_rate" min="0" max="100" step="0.01" value="0.1">
-              <small>Default: 0.1%</small>
-            </div>
-
-            <div class="form-group">
-              <label for="zus_health_insurance_income_threshold">Health Insurance Income Threshold</label>
-              <select id="zus_health_insurance_income_threshold" name="zus_health_insurance_income_threshold">
-                <option value="low">Up to 60,000 PLN annual income (461.66 PLN monthly)</option>
-                <option value="medium">Between 60,000 and 300,000 PLN annual income (773.23 PLN monthly)</option>
-                <option value="high">Above 300,000 PLN annual income (1,384.97 PLN monthly)</option>
-              </select>
-              <small>Select your annual income threshold for health insurance calculation</small>
-            </div>
-
-            <div class="form-group">
-              <label for="zus_health_insurance_amount">Custom Health Insurance Amount (PLN)</label>
-              <input type="number" id="zus_health_insurance_amount" name="zus_health_insurance_amount" min="0" step="0.01" value="0">
-              <small>Enter a fixed amount, or leave as 0 to use the amount based on income threshold</small>
-            </div>
-
-            <div class="zus-summary">
-              <h4>Calculated Monthly Contributions</h4>
-              <div id="zus-calculation-results">
-                <!-- Results will be displayed here -->
+                  <div class="form-group">
+                    <label for="zus_fep_rate">FEP (Bridging Pensions Fund) Rate (%)</label>
+                    <div class="input-with-reset">
+                      <input type="number" id="zus_fep_rate" name="zus_fep_rate" min="0" max="100" step="0.01" value="0.1">
+                      <button type="button" class="reset-btn" data-field="zus_fep_rate" data-default="0.1">Reset</button>
+                    </div>
+                    <small>Default: 0.1%</small>
+                  </div>
+                </div>
               </div>
+
+              <div class="zus-settings-column">
+                <div class="zus-settings-card">
+                  <h4>Optional Insurance</h4>
+                  <div class="form-group">
+                    <label for="zus_sickness_rate">Sickness Insurance Rate (%) - Optional</label>
+                    <div class="input-with-reset">
+                      <input type="number" id="zus_sickness_rate" name="zus_sickness_rate" min="0" max="100" step="0.01" value="2.45">
+                      <button type="button" class="reset-btn" data-field="zus_sickness_rate" data-default="2.45">Reset</button>
+                      <button type="button" class="zero-btn" data-field="zus_sickness_rate">Set to 0</button>
+                    </div>
+                    <small>Default: 2.45% - This insurance is voluntary, set to 0 if you don't want it</small>
+                  </div>
+                </div>
+
+                <div class="zus-settings-card">
+                  <h4>Health Insurance</h4>
+                  <div class="form-group">
+                    <label for="zus_health_insurance_income_threshold">Health Insurance Income Threshold</label>
+                    <select id="zus_health_insurance_income_threshold" name="zus_health_insurance_income_threshold" class="full-width">
+                      <option value="low">Up to 60,000 PLN annual income (461.66 PLN monthly)</option>
+                      <option value="medium">Between 60,000 and 300,000 PLN annual income (773.23 PLN monthly)</option>
+                      <option value="high">Above 300,000 PLN annual income (1,384.97 PLN monthly)</option>
+                    </select>
+                    <small>Select your annual income threshold for health insurance calculation</small>
+                  </div>
+
+                  <div class="form-group">
+                    <label for="zus_health_insurance_amount">Custom Health Insurance Amount (PLN)</label>
+                    <div class="input-with-reset">
+                      <input type="number" id="zus_health_insurance_amount" name="zus_health_insurance_amount" min="0" step="0.01" value="0">
+                      <button type="button" class="reset-btn" data-field="zus_health_insurance_amount" data-default="0">Reset</button>
+                    </div>
+                    <small>Enter a fixed amount, or leave as 0 to use the amount based on income threshold</small>
+                  </div>
+                </div>
+
+                <div class="zus-settings-card">
+                  <h4>Calculated Monthly Contributions</h4>
+                  <div id="zus-calculation-results" class="calculation-results">
+                    <!-- Results will be displayed here -->
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="button-row">
+              <button type="button" id="reset-all-zus" class="btn secondary-btn">Reset All to Defaults</button>
             </div>
           </div>
 
@@ -202,11 +249,113 @@
           margin-top: 5px;
         }
 
-        .zus-summary {
-          margin-top: 20px;
-          padding: 15px;
+        /* ZUS Settings Styles */
+        .zus-settings-container {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 20px;
+          margin-bottom: 20px;
+        }
+
+        .zus-settings-column {
+          flex: 1;
+          min-width: 300px;
+          display: flex;
+          flex-direction: column;
+          gap: 20px;
+        }
+
+        .zus-settings-card {
           background-color: #f8f9fa;
           border-radius: 5px;
+          padding: 15px;
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .zus-settings-card h4 {
+          margin-top: 0;
+          margin-bottom: 15px;
+          padding-bottom: 5px;
+          border-bottom: 1px solid #ddd;
+          color: #495057;
+        }
+
+        .input-with-reset {
+          display: flex;
+          gap: 5px;
+          align-items: center;
+        }
+
+        .input-with-reset input {
+          flex: 1;
+        }
+
+        .reset-btn {
+          background-color: #e9ecef;
+          border: 1px solid #ced4da;
+          border-radius: 4px;
+          padding: 4px 8px;
+          font-size: 0.8em;
+          cursor: pointer;
+          color: #495057;
+        }
+
+        .reset-btn:hover {
+          background-color: #dee2e6;
+        }
+
+        .zero-btn {
+          background-color: #d1ecf1;
+          border: 1px solid #bee5eb;
+          border-radius: 4px;
+          padding: 4px 8px;
+          font-size: 0.8em;
+          cursor: pointer;
+          color: #0c5460;
+        }
+
+        .zero-btn:hover {
+          background-color: #c3e6cb;
+        }
+
+        .full-width {
+          width: 100%;
+        }
+
+        .calculation-results {
+          margin-top: 10px;
+        }
+
+        .calculation-results table {
+          width: 100%;
+          border-collapse: collapse;
+        }
+
+        .calculation-results table tr:nth-child(even) {
+          background-color: #f2f2f2;
+        }
+
+        .calculation-results table tr:last-child {
+          font-weight: bold;
+          border-top: 1px solid #ddd;
+        }
+
+        .calculation-results table td {
+          padding: 8px;
+        }
+
+        .button-row {
+          margin-top: 20px;
+          display: flex;
+          justify-content: center;
+        }
+
+        .secondary-btn {
+          background-color: #6c757d;
+        }
+
+        .secondary-btn:hover {
+          background-color: #5a6268;
         }
       </style>
     </section>
@@ -283,6 +432,40 @@
       // Add change event listener to health insurance income threshold select
       document.getElementById('zus_health_insurance_income_threshold').addEventListener('change', calculateZusContributions);
 
+      // Add event listeners to reset buttons
+      document.querySelectorAll('.reset-btn').forEach(button => {
+        button.addEventListener('click', function() {
+          const fieldId = this.getAttribute('data-field');
+          const defaultValue = this.getAttribute('data-default');
+          document.getElementById(fieldId).value = defaultValue;
+          calculateZusContributions();
+        });
+      });
+
+      // Add event listener to "Set to 0" button for sickness insurance
+      document.querySelectorAll('.zero-btn').forEach(button => {
+        button.addEventListener('click', function() {
+          const fieldId = this.getAttribute('data-field');
+          document.getElementById(fieldId).value = 0;
+          calculateZusContributions();
+        });
+      });
+
+      // Add event listener to "Reset All to Defaults" button
+      document.getElementById('reset-all-zus').addEventListener('click', function() {
+        document.querySelectorAll('.reset-btn').forEach(button => {
+          const fieldId = button.getAttribute('data-field');
+          const defaultValue = button.getAttribute('data-default');
+          document.getElementById(fieldId).value = defaultValue;
+        });
+
+        // Reset health insurance income threshold to 'low'
+        document.getElementById('zus_health_insurance_income_threshold').value = 'low';
+
+        calculateZusContributions();
+        showMessage('success', 'All ZUS settings reset to defaults');
+      });
+
       // Function to fetch company profile
       function fetchCompanyProfile() {
         fetch('/api/company-profile')
@@ -307,16 +490,19 @@
               document.getElementById('bank_account_number').value = data.bank_account_number || '';
               document.getElementById('default_vat_rate').value = data.default_vat_rate || 23;
 
-              // Populate ZUS settings
-              document.getElementById('zus_base_amount').value = data.zus_base_amount || 5203.80;
-              document.getElementById('zus_retirement_rate').value = data.zus_retirement_rate || 19.52;
-              document.getElementById('zus_disability_rate').value = data.zus_disability_rate || 8.0;
-              document.getElementById('zus_accident_rate').value = data.zus_accident_rate || 1.67;
-              // For sickness insurance, we need to handle 0 as a valid value since it's optional
-              document.getElementById('zus_sickness_rate').value = data.zus_sickness_rate !== null && data.zus_sickness_rate !== undefined ? data.zus_sickness_rate : 2.45;
-              document.getElementById('zus_labor_fund_rate').value = data.zus_labor_fund_rate || 2.45;
-              document.getElementById('zus_fep_rate').value = data.zus_fep_rate || 0.1;
-              document.getElementById('zus_health_insurance_amount').value = data.zus_health_insurance_amount || 0;
+              // Populate ZUS settings - handle all numeric fields properly, allowing 0 as a valid value
+              const setNumericValue = (elementId, value, defaultValue) => {
+                document.getElementById(elementId).value = value !== null && value !== undefined ? value : defaultValue;
+              };
+
+              setNumericValue('zus_base_amount', data.zus_base_amount, 5203.80);
+              setNumericValue('zus_retirement_rate', data.zus_retirement_rate, 19.52);
+              setNumericValue('zus_disability_rate', data.zus_disability_rate, 8.0);
+              setNumericValue('zus_accident_rate', data.zus_accident_rate, 1.67);
+              setNumericValue('zus_sickness_rate', data.zus_sickness_rate, 2.45);
+              setNumericValue('zus_labor_fund_rate', data.zus_labor_fund_rate, 2.45);
+              setNumericValue('zus_fep_rate', data.zus_fep_rate, 0.1);
+              setNumericValue('zus_health_insurance_amount', data.zus_health_insurance_amount, 0);
 
               // Set health insurance income threshold
               const thresholdSelect = document.getElementById('zus_health_insurance_income_threshold');
@@ -409,15 +595,19 @@
 
       // Function to calculate ZUS contributions
       function calculateZusContributions() {
-        const baseAmount = parseFloat(document.getElementById('zus_base_amount').value) || 5203.80;
-        const retirementRate = parseFloat(document.getElementById('zus_retirement_rate').value) || 19.52;
-        const disabilityRate = parseFloat(document.getElementById('zus_disability_rate').value) || 8.0;
-        const accidentRate = parseFloat(document.getElementById('zus_accident_rate').value) || 1.67;
-        // For sickness insurance, we need to handle 0 as a valid value since it's optional
-        const sicknessRateInput = document.getElementById('zus_sickness_rate');
-        const sicknessRate = sicknessRateInput.value === '' ? 2.45 : parseFloat(sicknessRateInput.value);
-        const laborFundRate = parseFloat(document.getElementById('zus_labor_fund_rate').value) || 2.45;
-        const fepRate = parseFloat(document.getElementById('zus_fep_rate').value) || 0.1;
+        // Handle all numeric fields properly, allowing 0 as a valid value
+        const getNumericValue = (elementId, defaultValue) => {
+          const element = document.getElementById(elementId);
+          return element.value === '' ? defaultValue : parseFloat(element.value);
+        };
+
+        const baseAmount = getNumericValue('zus_base_amount', 5203.80);
+        const retirementRate = getNumericValue('zus_retirement_rate', 19.52);
+        const disabilityRate = getNumericValue('zus_disability_rate', 8.0);
+        const accidentRate = getNumericValue('zus_accident_rate', 1.67);
+        const sicknessRate = getNumericValue('zus_sickness_rate', 2.45);
+        const laborFundRate = getNumericValue('zus_labor_fund_rate', 2.45);
+        const fepRate = getNumericValue('zus_fep_rate', 0.1);
         const healthInsuranceAmount = parseFloat(document.getElementById('zus_health_insurance_amount').value) || 0;
 
         // Calculate contributions

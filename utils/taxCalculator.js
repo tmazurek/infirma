@@ -175,14 +175,18 @@ function calculateZUS(month, year, callback) {
 
     if (profile) {
       // Calculate ZUS using custom rates from company profile
-      const baseAmount = profile.zus_base_amount || 5203.80;
-      const retirementRate = profile.zus_retirement_rate || 19.52;
-      const disabilityRate = profile.zus_disability_rate || 8.0;
-      const accidentRate = profile.zus_accident_rate || 1.67;
-      // For sickness insurance, we need to handle 0 as a valid value since it's optional
-      const sicknessRate = profile.zus_sickness_rate !== null && profile.zus_sickness_rate !== undefined ? profile.zus_sickness_rate : 2.45;
-      const laborFundRate = profile.zus_labor_fund_rate || 2.45;
-      const fepRate = profile.zus_fep_rate || 0.1;
+      // Handle all numeric fields properly, allowing 0 as a valid value
+      const getNumericValue = (value, defaultValue) => {
+        return value !== null && value !== undefined ? value : defaultValue;
+      };
+
+      const baseAmount = getNumericValue(profile.zus_base_amount, 5203.80);
+      const retirementRate = getNumericValue(profile.zus_retirement_rate, 19.52);
+      const disabilityRate = getNumericValue(profile.zus_disability_rate, 8.0);
+      const accidentRate = getNumericValue(profile.zus_accident_rate, 1.67);
+      const sicknessRate = getNumericValue(profile.zus_sickness_rate, 2.45);
+      const laborFundRate = getNumericValue(profile.zus_labor_fund_rate, 2.45);
+      const fepRate = getNumericValue(profile.zus_fep_rate, 0.1);
 
       // Calculate contributions
       const retirement = (baseAmount * retirementRate / 100).toFixed(2) * 1;
