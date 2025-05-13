@@ -179,7 +179,8 @@ function calculateZUS(month, year, callback) {
       const retirementRate = profile.zus_retirement_rate || 19.52;
       const disabilityRate = profile.zus_disability_rate || 8.0;
       const accidentRate = profile.zus_accident_rate || 1.67;
-      const sicknessRate = profile.zus_sickness_rate || 2.45;
+      // For sickness insurance, we need to handle 0 as a valid value since it's optional
+      const sicknessRate = profile.zus_sickness_rate !== null && profile.zus_sickness_rate !== undefined ? profile.zus_sickness_rate : 2.45;
       const laborFundRate = profile.zus_labor_fund_rate || 2.45;
       const fepRate = profile.zus_fep_rate || 0.1;
 

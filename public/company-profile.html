@@ -312,7 +312,8 @@
               document.getElementById('zus_retirement_rate').value = data.zus_retirement_rate || 19.52;
               document.getElementById('zus_disability_rate').value = data.zus_disability_rate || 8.0;
               document.getElementById('zus_accident_rate').value = data.zus_accident_rate || 1.67;
-              document.getElementById('zus_sickness_rate').value = data.zus_sickness_rate || 2.45;
+              // For sickness insurance, we need to handle 0 as a valid value since it's optional
+              document.getElementById('zus_sickness_rate').value = data.zus_sickness_rate !== null && data.zus_sickness_rate !== undefined ? data.zus_sickness_rate : 2.45;
               document.getElementById('zus_labor_fund_rate').value = data.zus_labor_fund_rate || 2.45;
               document.getElementById('zus_fep_rate').value = data.zus_fep_rate || 0.1;
               document.getElementById('zus_health_insurance_amount').value = data.zus_health_insurance_amount || 0;
@@ -412,7 +413,9 @@
         const retirementRate = parseFloat(document.getElementById('zus_retirement_rate').value) || 19.52;
         const disabilityRate = parseFloat(document.getElementById('zus_disability_rate').value) || 8.0;
         const accidentRate = parseFloat(document.getElementById('zus_accident_rate').value) || 1.67;
-        const sicknessRate = parseFloat(document.getElementById('zus_sickness_rate').value) || 2.45;
+        // For sickness insurance, we need to handle 0 as a valid value since it's optional
+        const sicknessRateInput = document.getElementById('zus_sickness_rate');
+        const sicknessRate = sicknessRateInput.value === '' ? 2.45 : parseFloat(sicknessRateInput.value);
         const laborFundRate = parseFloat(document.getElementById('zus_labor_fund_rate').value) || 2.45;
         const fepRate = parseFloat(document.getElementById('zus_fep_rate').value) || 0.1;
         const healthInsuranceAmount = parseFloat(document.getElementById('zus_health_insurance_amount').value) || 0;
