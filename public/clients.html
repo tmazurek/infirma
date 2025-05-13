@@ -119,7 +119,11 @@
 
         <div class="form-group">
           <label for="nip">NIP (Tax ID)</label>
-          <input type="text" id="nip" name="nip" pattern="[0-9]{10}" title="NIP must be 10 digits">
+          <div style="display: flex; gap: 10px;">
+            <input type="text" id="nip" name="nip" pattern="[0-9]{10}" title="NIP must be 10 digits" style="flex: 1;">
+            <button type="button" id="verify-nip-btn" class="btn" style="background-color: #17a2b8;">Verify NIP</button>
+          </div>
+          <div id="nip-verification-status" style="margin-top: 5px; font-size: 0.9em;"></div>
         </div>
 
         <div class="form-group">
@@ -185,6 +189,8 @@
       const deleteClientName = document.getElementById('delete-client-name');
       const confirmDeleteBtn = document.getElementById('confirm-delete');
       const cancelDeleteBtn = document.getElementById('cancel-delete');
+      const verifyNipBtn = document.getElementById('verify-nip-btn');
+      const nipVerificationStatus = document.getElementById('nip-verification-status');
 
       // Close buttons for modals
       const closeButtons = document.querySelectorAll('.close');
@@ -198,6 +204,59 @@
       // Cancel delete button
       cancelDeleteBtn.addEventListener('click', function() {
         deleteModal.style.display = 'none';
+      });
+
+      // Verify NIP button click
+      verifyNipBtn.addEventListener('click', function() {
+        const nip = document.getElementById('nip').value.trim();
+
+        if (!nip) {
+          nipVerificationStatus.innerHTML = '<span style="color: #721c24;">Please enter a NIP</span>';
+          return;
+        }
+
+        if (!/^\d{10}$/.test(nip)) {
+          nipVerificationStatus.innerHTML = '<span style="color: #721c24;">NIP must be 10 digits</span>';
+          return;
+        }
+
+        // Show loading status
+        nipVerificationStatus.innerHTML = '<span style="color: #0c5460;">Verifying NIP...</span>';
+
+        // Call the API to validate NIP
+        fetch(`/api/validate-nip/${nip}`)
+          .then(response => response.json())
+          .then(data => {
+            if (data.success) {
+              // Show success message
+              nipVerificationStatus.innerHTML = '<span style="color: #155724;">NIP verified successfully!</span>';
+
+              // Populate form fields with company data
+              document.getElementById('client_name').value = data.data.name || '';
+              document.getElementById('street_address').value = data.data.address ? data.data.address.split(' ').slice(0, -2).join(' ') : '';
+
+              // Try to extract city and postal code from address
+              if (data.data.address) {
+                const addressParts = data.data.address.split(' ');
+                if (addressParts.length >= 2) {
+                  const postalCode = addressParts[addressParts.length - 2];
+                  const city = addressParts[addressParts.length - 1];
+
+                  if (/^\d{2}-\d{3}$/.test(postalCode)) {
+                    document.getElementById('postal_code').value = postalCode;
+                    document.getElementById('city').value = city;
+                  }
+                }
+              }
+            } else {
+              // Show error message
+              nipVerificationStatus.innerHTML = `<span style="color: #721c24;">${data.error}</span>`;
+            }
+          })
+          .catch(error => {
+            // Show error message
+            nipVerificationStatus.innerHTML = `<span style="color: #721c24;">Error: ${error.message}</span>`;
+          });
       });
 
       // Load clients on page load
@@ -390,6 +449,7 @@
       function resetClientForm() {
         clientForm.reset();
         clientIdInput.value = '';
+        nipVerificationStatus.innerHTML = '';
       }
 
       // Function to show messages

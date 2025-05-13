@@ -9,6 +9,7 @@ const clientsRoutes = require('./routes/clients');
 const invoicesRoutes = require('./routes/invoices');
 const expensesRoutes = require('./routes/expenses');
 const financialSummaryRoutes = require('./routes/financialSummary');
+const nipValidatorRoutes = require('./routes/nipValidator');
 
 // Middleware
 app.use(express.json());
@@ -21,6 +22,7 @@ app.use('/api/clients', clientsRoutes);
 app.use('/api/invoices', invoicesRoutes);
 app.use('/api/expenses', expensesRoutes);
 app.use('/api/financial-summary', financialSummaryRoutes);
+app.use('/api/validate-nip', nipValidatorRoutes);
 
 // Frontend Routes
 app.get('/', (req, res) => {
