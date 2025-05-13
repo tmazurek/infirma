@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Invoices - Infirma</title>
+  <link rel="stylesheet" href="/styles.css">
+  <style>
+    .invoice-list {
+      margin-top: 20px;
+    }
+    .invoice-actions {
+      display: flex;
+      gap: 10px;
+    }
+    .btn-view, .btn-status {
+      padding: 5px 10px;
+      font-size: 14px;
+    }
+    .btn-view {
+      background-color: #17a2b8;
+    }
+    .status-badge {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: bold;
+    }
+    .status-draft {
+      background-color: #ffc107;
+      color: #212529;
+    }
+    .status-issued {
+      background-color: #17a2b8;
+      color: white;
+    }
+    .status-paid {
+      background-color: #28a745;
+      color: white;
+    }
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0,0,0,0.4);
+    }
+    .modal-content {
+      background-color: #fefefe;
+      margin: 10% auto;
+      padding: 20px;
+      border-radius: 5px;
+      width: 80%;
+      max-width: 600px;
+    }
+    .close {
+      color: #aaa;
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .close:hover {
+      color: black;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container">
+      <h1>Infirma</h1>
+      <nav>
+        <ul>
+          <li><a href="/">Home</a></li>
+          <li><a href="/company-profile">Company Profile</a></li>
+          <li><a href="/clients">Clients</a></li>
+          <li><a href="/invoices">Invoices</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="mt-3">
+      <h2>Invoices</h2>
+      <p>Manage your invoices and track payments.</p>
+      
+      <div id="message-container" class="mb-3" style="display: none;"></div>
+      
+      <a href="/create-invoice" class="btn mb-3">Create New Invoice</a>
+      
+      <div class="invoice-list">
+        <table id="invoices-table">
+          <thead>
+            <tr>
+              <th>Invoice Number</th>
+              <th>Client</th>
+              <th>Issue Date</th>
+              <th>Due Date</th>
+              <th>Total</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="invoices-table-body">
+            <!-- Invoice rows will be added here dynamically -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <!-- Status Update Modal -->
+  <div id="status-modal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h3>Update Invoice Status</h3>
+      <p>Invoice: <span id="status-invoice-number"></span></p>
+      
+      <form id="status-form">
+        <input type="hidden" id="invoice-id">
+        
+        <div class="form-group">
+          <label for="status">Status</label>
+          <select id="status" name="status" required>
+            <option value="Draft">Draft</option>
+            <option value="Issued">Issued</option>
+            <option value="Paid">Paid</option>
+          </select>
+        </div>
+        
+        <button type="submit" class="btn">Update Status</button>
+      </form>
+    </div>
+  </div>
+
+  <footer class="text-center mt-3">
+    <div class="container">
+      <p>&copy; 2025 Infirma - Accounting App</p>
+    </div>
+  </footer>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // DOM Elements
+      const invoicesTableBody = document.getElementById('invoices-table-body');
+      const statusModal = document.getElementById('status-modal');
+      const statusForm = document.getElementById('status-form');
+      const invoiceIdInput = document.getElementById('invoice-id');
+      const statusInvoiceNumber = document.getElementById('status-invoice-number');
+      const messageContainer = document.getElementById('message-container');
+      
+      // Close buttons for modals
+      const closeButtons = document.querySelectorAll('.close');
+      closeButtons.forEach(btn => {
+        btn.addEventListener('click', function() {
+          statusModal.style.display = 'none';
+        });
+      });
+      
+      // Load invoices on page load
+      loadInvoices();
+      
+      // Status form submission
+      statusForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        updateInvoiceStatus();
+      });
+      
+      // Function to load all invoices
+      function loadInvoices() {
+        fetch('/api/invoices')
+          .then(response => {
+            if (!response.ok) {
+              throw new Error('Failed to fetch invoices');
+            }
+            return response.json();
+          })
+          .then(invoices => {
+            displayInvoices(invoices);
+          })
+          .catch(error => {
+            showMessage('error', 'Error loading invoices: ' + error.message);
+          });
+      }
+      
+      // Function to display invoices in the table
+      function displayInvoices(invoices) {
+        invoicesTableBody.innerHTML = '';
+        
+        if (invoices.length === 0) {
+          const row = document.createElement('tr');
+          row.innerHTML = '<td colspan="7" class="text-center">No invoices found. Create your first invoice!</td>';
+          invoicesTableBody.appendChild(row);
+          return;
+        }
+        
+        invoices.forEach(invoice => {
+          const row = document.createElement('tr');
+          
+          // Format dates
+          const issueDate = new Date(invoice.issue_date).toLocaleDateString();
+          const dueDate = invoice.due_date ? new Date(invoice.due_date).toLocaleDateString() : '-';
+          
+          // Format status badge
+          const statusClass = `status-${invoice.status.toLowerCase()}`;
+          
+          row.innerHTML = `
+            <td>${invoice.invoice_number}</td>
+            <td>${invoice.client_name}</td>
+            <td>${issueDate}</td>
+            <td>${dueDate}</td>
+            <td>${invoice.total_gross.toFixed(2)} PLN</td>
+            <td><span class="status-badge ${statusClass}">${invoice.status}</span></td>
+            <td class="invoice-actions">
+              <a href="/view-invoice/${invoice.id}" class="btn btn-view">View</a>
+              <button class="btn btn-status" data-id="${invoice.id}" data-number="${invoice.invoice_number}" data-status="${invoice.status}">Status</button>
+            </td>
+          `;
+          invoicesTableBody.appendChild(row);
+        });
+        
+        // Add event listeners to status buttons
+        document.querySelectorAll('.btn-status').forEach(btn => {
+          btn.addEventListener('click', function() {
+            const invoiceId = this.getAttribute('data-id');
+            const invoiceNumber = this.getAttribute('data-number');
+            const currentStatus = this.getAttribute('data-status');
+            showStatusModal(invoiceId, invoiceNumber, currentStatus);
+          });
+        });
+      }
+      
+      // Function to show status update modal
+      function showStatusModal(invoiceId, invoiceNumber, currentStatus) {
+        invoiceIdInput.value = invoiceId;
+        statusInvoiceNumber.textContent = invoiceNumber;
+        document.getElementById('status').value = currentStatus;
+        statusModal.style.display = 'block';
+      }
+      
+      // Function to update invoice status
+      function updateInvoiceStatus() {
+        const invoiceId = invoiceIdInput.value;
+        const status = document.getElementById('status').value;
+        
+        fetch(`/api/invoices/${invoiceId}/status`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ status })
+        })
+        .then(response => {
+          if (!response.ok) {
+            return response.json().then(err => {
+              throw new Error(err.error || 'Failed to update invoice status');
+            });
+          }
+          return response.json();
+        })
+        .then(data => {
+          statusModal.style.display = 'none';
+          showMessage('success', data.message);
+          loadInvoices(); // Reload the invoices list
+        })
+        .catch(error => {
+          showMessage('error', error.message);
+        });
+      }
+      
+      // Function to show messages
+      function showMessage(type, message) {
+        messageContainer.innerHTML = `<div class="${type === 'error' ? 'error' : 'success'}">${message}</div>`;
+        messageContainer.style.display = 'block';
+        
+        // Add some basic styling for messages
+        const style = document.createElement('style');
+        style.textContent = `
+          .success {
+            background-color: #d4edda;
+            color: #155724;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+          }
+          .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+          }
+        `;
+        document.head.appendChild(style);
+        
+        // Auto-hide message after 5 seconds
+        setTimeout(() => {
+          messageContainer.style.display = 'none';
+        }, 5000);
+      }
+      
+      // Close modal when clicking outside of it
+      window.addEventListener('click', function(event) {
+        if (event.target === statusModal) {
+          statusModal.style.display = 'none';
+        }
+      });
+    });
+  </script>
+</body>
+</html>

@@ -66,6 +66,7 @@
           <li><a href="/">Home</a></li>
           <li><a href="/company-profile">Company Profile</a></li>
           <li><a href="/clients">Clients</a></li>
+          <li><a href="/invoices">Invoices</a></li>
         </ul>
       </nav>
     </div>
@@ -75,11 +76,11 @@
     <section class="mt-3">
       <h2>Client Management</h2>
       <p>Manage your clients for efficient invoice creation.</p>
-      
+
       <div id="message-container" class="mb-3" style="display: none;"></div>
-      
+
       <button id="add-client-btn" class="btn mb-3">Add New Client</button>
-      
+
       <div class="client-list">
         <table id="clients-table">
           <thead>
@@ -105,45 +106,45 @@
     <div class="modal-content">
       <span class="close">&times;</span>
       <h3 id="modal-title">Add New Client</h3>
-      
+
       <form id="client-form">
         <input type="hidden" id="client-id">
-        
+
         <div class="form-group">
           <label for="client_name">Client Name *</label>
           <input type="text" id="client_name" name="client_name" required>
         </div>
-        
+
         <div class="form-group">
           <label for="nip">NIP (Tax ID)</label>
           <input type="text" id="nip" name="nip" pattern="[0-9]{10}" title="NIP must be 10 digits">
         </div>
-        
+
         <div class="form-group">
           <label for="street_address">Street Address</label>
           <input type="text" id="street_address" name="street_address">
         </div>
-        
+
         <div class="form-group">
           <label for="city">City</label>
           <input type="text" id="city" name="city">
         </div>
-        
+
         <div class="form-group">
           <label for="postal_code">Postal Code</label>
           <input type="text" id="postal_code" name="postal_code" pattern="[0-9]{2}-[0-9]{3}" title="Format: 00-000">
         </div>
-        
+
         <div class="form-group">
           <label for="email">Email</label>
           <input type="email" id="email" name="email">
         </div>
-        
+
         <div class="form-group">
           <label for="contact_person">Contact Person</label>
           <input type="text" id="contact_person" name="contact_person">
         </div>
-        
+
         <button type="submit" class="btn">Save Client</button>
       </form>
     </div>
@@ -182,7 +183,7 @@
       const deleteClientName = document.getElementById('delete-client-name');
       const confirmDeleteBtn = document.getElementById('confirm-delete');
       const cancelDeleteBtn = document.getElementById('cancel-delete');
-      
+
       // Close buttons for modals
       const closeButtons = document.querySelectorAll('.close');
       closeButtons.forEach(btn => {
@@ -191,28 +192,28 @@
           deleteModal.style.display = 'none';
         });
       });
-      
+
       // Cancel delete button
       cancelDeleteBtn.addEventListener('click', function() {
         deleteModal.style.display = 'none';
       });
-      
+
       // Load clients on page load
       loadClients();
-      
+
       // Add client button click
       addClientBtn.addEventListener('click', function() {
         resetClientForm();
         modalTitle.textContent = 'Add New Client';
         clientModal.style.display = 'block';
       });
-      
+
       // Client form submission
       clientForm.addEventListener('submit', function(e) {
         e.preventDefault();
         saveClient();
       });
-      
+
       // Function to load all clients
       function loadClients() {
         fetch('/api/clients')
@@ -229,18 +230,18 @@
             showMessage('error', 'Error loading clients: ' + error.message);
           });
       }
-      
+
       // Function to display clients in the table
       function displayClients(clients) {
         clientsTableBody.innerHTML = '';
-        
+
         if (clients.length === 0) {
           const row = document.createElement('tr');
           row.innerHTML = '<td colspan="6" class="text-center">No clients found. Add your first client!</td>';
           clientsTableBody.appendChild(row);
           return;
         }
-        
+
         clients.forEach(client => {
           const row = document.createElement('tr');
           row.innerHTML = `
@@ -256,7 +257,7 @@
           `;
           clientsTableBody.appendChild(row);
         });
-        
+
         // Add event listeners to edit and delete buttons
         document.querySelectorAll('.btn-edit').forEach(btn => {
           btn.addEventListener('click', function() {
@@ -264,7 +265,7 @@
             editClient(clientId);
           });
         });
-        
+
         document.querySelectorAll('.btn-delete').forEach(btn => {
           btn.addEventListener('click', function() {
             const clientId = this.getAttribute('data-id');
@@ -273,7 +274,7 @@
           });
         });
       }
-      
+
       // Function to edit a client
       function editClient(clientId) {
         fetch(`/api/clients/${clientId}`)
@@ -293,7 +294,7 @@
             document.getElementById('postal_code').value = client.postal_code || '';
             document.getElementById('email').value = client.email || '';
             document.getElementById('contact_person').value = client.contact_person || '';
-            
+
             // Update modal title and show modal
             modalTitle.textContent = 'Edit Client';
             clientModal.style.display = 'block';
@@ -302,20 +303,20 @@
             showMessage('error', 'Error loading client details: ' + error.message);
           });
       }
-      
+
       // Function to show delete confirmation
       function showDeleteConfirmation(clientId, clientName) {
         deleteClientName.textContent = clientName;
         confirmDeleteBtn.setAttribute('data-id', clientId);
         deleteModal.style.display = 'block';
-        
+
         // Set up the confirm delete button
         confirmDeleteBtn.onclick = function() {
           const id = this.getAttribute('data-id');
           deleteClient(id);
         };
       }
-      
+
       // Function to delete a client
       function deleteClient(clientId) {
         fetch(`/api/clients/${clientId}`, {
@@ -339,12 +340,12 @@
           showMessage('error', error.message);
         });
       }
-      
+
       // Function to save a client (create or update)
       function saveClient() {
         const clientId = clientIdInput.value;
         const isUpdate = clientId !== '';
-        
+
         const clientData = {
           client_name: document.getElementById('client_name').value,
           nip: document.getElementById('nip').value,
@@ -354,10 +355,10 @@
           email: document.getElementById('email').value,
           contact_person: document.getElementById('contact_person').value
         };
-        
+
         const url = isUpdate ? `/api/clients/${clientId}` : '/api/clients';
         const method = isUpdate ? 'PUT' : 'POST';
-        
+
         fetch(url, {
           method: method,
           headers: {
@@ -382,18 +383,18 @@
           showMessage('error', error.message);
         });
       }
-      
+
       // Function to reset the client form
       function resetClientForm() {
         clientForm.reset();
         clientIdInput.value = '';
       }
-      
+
       // Function to show messages
       function showMessage(type, message) {
         messageContainer.innerHTML = `<div class="${type === 'error' ? 'error' : 'success'}">${message}</div>`;
         messageContainer.style.display = 'block';
-        
+
         // Add some basic styling for messages
         const style = document.createElement('style');
         style.textContent = `
@@ -413,13 +414,13 @@
           }
         `;
         document.head.appendChild(style);
-        
+
         // Auto-hide message after 5 seconds
         setTimeout(() => {
           messageContainer.style.display = 'none';
         }, 5000);
       }
-      
+
       // Close modal when clicking outside of it
       window.addEventListener('click', function(event) {
         if (event.target === clientModal) {

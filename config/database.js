@@ -47,6 +47,39 @@ function initializeDatabase() {
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
       updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
+
+    -- Invoices table
+    CREATE TABLE IF NOT EXISTS Invoices (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      invoice_number TEXT UNIQUE NOT NULL,
+      client_id INTEGER NOT NULL,
+      issue_date DATE NOT NULL,
+      due_date DATE,
+      payment_terms TEXT,
+      company_profile_snapshot TEXT, -- JSON string of company details
+      total_net REAL NOT NULL,
+      total_vat REAL NOT NULL,
+      total_gross REAL NOT NULL,
+      status TEXT DEFAULT 'Draft', -- 'Draft', 'Issued', 'Paid'
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (client_id) REFERENCES Clients(id)
+    );
+
+    -- InvoiceItems table
+    CREATE TABLE IF NOT EXISTS InvoiceItems (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      invoice_id INTEGER NOT NULL,
+      description TEXT NOT NULL,
+      quantity REAL NOT NULL,
+      unit_price_net REAL NOT NULL,
+      vat_rate REAL NOT NULL,
+      item_total_net REAL NOT NULL,
+      item_total_vat REAL NOT NULL,
+      item_total_gross REAL NOT NULL,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (invoice_id) REFERENCES Invoices(id) ON DELETE CASCADE
+    );
   `;
 
   db.exec(createTablesSQL, (err) => {

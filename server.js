@@ -6,6 +6,7 @@ const PORT = process.env.PORT || 3000;
 // Import routes
 const companyProfileRoutes = require('./routes/companyProfile');
 const clientsRoutes = require('./routes/clients');
+const invoicesRoutes = require('./routes/invoices');
 
 // Middleware
 app.use(express.json());
@@ -15,6 +16,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 // API Routes
 app.use('/api/company-profile', companyProfileRoutes);
 app.use('/api/clients', clientsRoutes);
+app.use('/api/invoices', invoicesRoutes);
 
 // Frontend Routes
 app.get('/', (req, res) => {
@@ -29,6 +31,21 @@ app.get('/company-profile', (req, res) => {
 // Clients page
 app.get('/clients', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'clients.html'));
+});
+
+// Invoices list page
+app.get('/invoices', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'invoices.html'));
+});
+
+// Create invoice page
+app.get('/create-invoice', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'create-invoice.html'));
+});
+
+// View invoice page
+app.get('/view-invoice/:id', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'view-invoice.html'));
 });
 
 // Start server
