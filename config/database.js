@@ -33,6 +33,20 @@ function initializeDatabase() {
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
       updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
+
+    -- Clients table
+    CREATE TABLE IF NOT EXISTS Clients (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      client_name TEXT NOT NULL,
+      nip TEXT UNIQUE,
+      street_address TEXT,
+      city TEXT,
+      postal_code TEXT,
+      email TEXT,
+      contact_person TEXT,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
   `;
 
   db.exec(createTablesSQL, (err) => {
