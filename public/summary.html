@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Financial Summary - Infirma</title>
   <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
     .date-selector {
       background-color: #f8f9fa;
@@ -256,185 +257,245 @@
 </head>
 <body>
   <header>
-    <div class="container">
-      <h1>Infirma</h1>
-      <nav>
-        <ul>
-          <li><a href="/">Home</a></li>
-          <li><a href="/company-profile">Company Profile</a></li>
-          <li><a href="/clients">Clients</a></li>
-          <li><a href="/invoices">Invoices</a></li>
-          <li><a href="/expenses">Expenses</a></li>
-          <li><a href="/summary">Summary</a></li>
-        </ul>
-      </nav>
+    <div class="container header-container">
+      <div class="d-flex align-center">
+        <img src="https://via.placeholder.com/32x32/0078d4/ffffff?text=I" alt="Infirma Logo" class="logo">
+        <h1>Infirma</h1>
+        <span class="premium-button">Odbierz 500 PLN</span>
+      </div>
+      <div class="user-menu">
+        <i class="fas fa-search icon"></i>
+        <i class="far fa-bell icon"></i>
+        <i class="far fa-folder icon"></i>
+        <i class="fas fa-cog icon"></i>
+        <div class="user-profile">
+          <span>tmazurek@outlook.com</span>
+          <i class="fas fa-chevron-down"></i>
+        </div>
+      </div>
     </div>
+    <nav>
+      <div class="container">
+        <ul>
+          <li><a href="/">Przychody</a></li>
+          <li><a href="/expenses">Koszty</a></li>
+          <li><a href="/summary" class="active">Księgowość</a></li>
+          <li><a href="/company-profile">Firma</a></li>
+          <li><a href="/clients">Klienci</a></li>
+          <li><a href="/invoices">Faktury</a></li>
+        </ul>
+      </div>
+    </nav>
   </header>
 
   <main class="container">
-    <section class="mt-3">
-      <h2>Monthly Financial Summary</h2>
-      <p>View estimated tax obligations based on your recorded financial data.</p>
-
-      <div id="message-container" class="mb-3" style="display: none;"></div>
-
-      <div class="date-selector">
-        <div class="form-group">
-          <label for="month">Month</label>
-          <select id="month" name="month">
-            <option value="1">January</option>
-            <option value="2">February</option>
-            <option value="3">March</option>
-            <option value="4">April</option>
-            <option value="5">May</option>
-            <option value="6">June</option>
-            <option value="7">July</option>
-            <option value="8">August</option>
-            <option value="9">September</option>
-            <option value="10">October</option>
-            <option value="11">November</option>
-            <option value="12">December</option>
-          </select>
-        </div>
-
-        <div class="form-group">
-          <label for="year">Year</label>
-          <select id="year" name="year">
-            <!-- Years will be added dynamically -->
-          </select>
-        </div>
-
-        <button id="generate-btn" class="btn">Generate Summary</button>
+    <div class="dashboard-greeting">
+      <div class="greeting-text">
+        <h1>Podsumowanie finansowe</h1>
       </div>
+      <div class="action-buttons">
+        <button class="action-button">
+          <i class="fas fa-download"></i> Eksportuj PDF
+        </button>
+        <button class="action-button">
+          <i class="fas fa-print"></i> Drukuj
+        </button>
+      </div>
+    </div>
 
-      <!-- Payment Notice Section (similar to inFakt) -->
-      <div id="payment-notice" class="payment-notice" style="display: none;">
-        <div class="payment-notice-header">
-          <div class="payment-notice-title">
-            <h3>Total payments for <span id="payment-month-year">April 2025</span></h3>
-            <div class="payment-total">
-              <span id="payment-total-amount">0.00 PLN</span>
-            </div>
+    <div id="message-container" class="mb-3" style="display: none;"></div>
+
+    <div class="card">
+      <div class="card-header">
+        <h2>Wybierz okres rozliczeniowy</h2>
+      </div>
+      <div class="card-body">
+        <div class="date-selector">
+          <div class="form-group">
+            <label for="month">Miesiąc</label>
+            <select id="month" name="month">
+              <option value="1">Styczeń</option>
+              <option value="2">Luty</option>
+              <option value="3">Marzec</option>
+              <option value="4">Kwiecień</option>
+              <option value="5">Maj</option>
+              <option value="6">Czerwiec</option>
+              <option value="7">Lipiec</option>
+              <option value="8">Sierpień</option>
+              <option value="9">Wrzesień</option>
+              <option value="10">Październik</option>
+              <option value="11">Listopad</option>
+              <option value="12">Grudzień</option>
+            </select>
           </div>
-          <div class="payment-notice-action">
-            <button id="pay-all-btn" class="btn pay-btn">Pay All</button>
+
+          <div class="form-group">
+            <label for="year">Rok</label>
+            <select id="year" name="year">
+              <!-- Years will be added dynamically -->
+            </select>
           </div>
+
+          <button id="generate-btn" class="btn">Generuj podsumowanie</button>
         </div>
-        <div class="payment-notice-info">
-          Pay all outstanding taxes and contributions in one transfer.
+      </div>
+    </div>
+
+    <!-- Payment Notice Section (similar to inFakt) -->
+    <div class="card mt-3" id="payment-notice" style="display: none;">
+      <div class="card-header">
+        <h2>Płatności za <span id="payment-month-year">kwiecień 2025</span></h2>
+        <button id="pay-all-btn" class="btn btn-success">
+          <i class="fas fa-credit-card"></i> Opłać wszystko
+        </button>
+      </div>
+      <div class="card-body">
+        <div class="payment-notice-info mb-3">
+          <i class="fas fa-info-circle"></i>
+          Opłać wszystkie zobowiązania podatkowe jednym przelewem.
           <br>
-          <strong>NOTE:</strong> To pay more than 4,300.00 PLN, you need to verify your account.
+          <strong>UWAGA:</strong> Aby zapłacić więcej niż 4 300,00 PLN, musisz zweryfikować swoje konto.
+        </div>
+
+        <div class="payment-total mb-3">
+          <div class="d-flex justify-between align-center">
+            <span class="text-muted">Łączna kwota do zapłaty:</span>
+            <span id="payment-total-amount" class="finance-item-amount">0,00 PLN</span>
+          </div>
         </div>
 
         <div id="payment-details" class="payment-details">
           <!-- Payment details will be populated dynamically -->
         </div>
       </div>
+    </div>
 
-      <div id="summary-container" class="summary-container">
+    <div class="card mt-3" id="summary-container" style="display: none;">
+      <div class="card-header">
+        <h2>Szczegółowe podsumowanie</h2>
+      </div>
+      <div class="card-body">
         <div class="summary-section">
-          <h3>Income & Expenses</h3>
+          <h3>Przychody i koszty</h3>
           <div class="summary-row">
-            <div class="summary-label">Total Income (Net):</div>
-            <div id="income" class="summary-value">0.00 PLN</div>
+            <div class="summary-label">Przychody (netto):</div>
+            <div id="income" class="summary-value">0,00 PLN</div>
           </div>
           <div class="summary-row">
-            <div class="summary-label">Total Expenses (Net):</div>
-            <div id="expenses" class="summary-value">0.00 PLN</div>
+            <div class="summary-label">Koszty (netto):</div>
+            <div id="expenses" class="summary-value">0,00 PLN</div>
           </div>
         </div>
 
         <div class="summary-section">
           <h3>VAT</h3>
           <div class="summary-row">
-            <div class="summary-label">VAT Collected:</div>
-            <div id="vat-collected" class="summary-value">0.00 PLN</div>
+            <div class="summary-label">VAT należny:</div>
+            <div id="vat-collected" class="summary-value">0,00 PLN</div>
           </div>
           <div class="summary-row">
-            <div class="summary-label">VAT Paid:</div>
-            <div id="vat-paid" class="summary-value">0.00 PLN</div>
+            <div class="summary-label">VAT naliczony:</div>
+            <div id="vat-paid" class="summary-value">0,00 PLN</div>
           </div>
           <div class="summary-row total-row">
-            <div class="summary-label">VAT Due:</div>
-            <div id="vat-due" class="summary-value">0.00 PLN</div>
+            <div class="summary-label">VAT do zapłaty:</div>
+            <div id="vat-due" class="summary-value">0,00 PLN</div>
           </div>
         </div>
 
         <div class="summary-section">
-          <h3>Income Tax (Ryczałt 12%)</h3>
+          <h3>Podatek dochodowy (Ryczałt 12%)</h3>
           <div class="summary-row">
-            <div class="summary-label">Taxable Income:</div>
-            <div id="taxable-income" class="summary-value">0.00 PLN</div>
+            <div class="summary-label">Dochód do opodatkowania:</div>
+            <div id="taxable-income" class="summary-value">0,00 PLN</div>
           </div>
           <div class="summary-row">
-            <div class="summary-label">Tax Rate:</div>
+            <div class="summary-label">Stawka podatku:</div>
             <div id="tax-rate" class="summary-value">12%</div>
           </div>
           <div class="summary-row total-row">
-            <div class="summary-label">Income Tax Due:</div>
-            <div id="income-tax" class="summary-value">0.00 PLN</div>
+            <div class="summary-label">Podatek dochodowy do zapłaty:</div>
+            <div id="income-tax" class="summary-value">0,00 PLN</div>
           </div>
         </div>
 
         <div class="summary-section">
-          <h3>ZUS (Social Security)</h3>
+          <h3>ZUS (Ubezpieczenia społeczne)</h3>
           <div class="summary-row">
-            <div class="summary-label">Retirement Insurance:</div>
-            <div id="zus-retirement" class="summary-value">0.00 PLN</div>
+            <div class="summary-label">Ubezpieczenie emerytalne:</div>
+            <div id="zus-retirement" class="summary-value">0,00 PLN</div>
           </div>
           <div class="summary-row">
-            <div class="summary-label">Disability Insurance:</div>
-            <div id="zus-disability" class="summary-value">0.00 PLN</div>
+            <div class="summary-label">Ubezpieczenie rentowe:</div>
+            <div id="zus-disability" class="summary-value">0,00 PLN</div>
           </div>
           <div class="summary-row">
-            <div class="summary-label">Sickness Insurance:</div>
-            <div id="zus-sickness" class="summary-value">0.00 PLN</div>
+            <div class="summary-label">Ubezpieczenie chorobowe:</div>
+            <div id="zus-sickness" class="summary-value">0,00 PLN</div>
           </div>
           <div class="summary-row">
-            <div class="summary-label">Accident Insurance:</div>
-            <div id="zus-accident" class="summary-value">0.00 PLN</div>
+            <div class="summary-label">Ubezpieczenie wypadkowe:</div>
+            <div id="zus-accident" class="summary-value">0,00 PLN</div>
           </div>
           <div class="summary-row">
-            <div class="summary-label">Labor Fund:</div>
-            <div id="zus-labor-fund" class="summary-value">0.00 PLN</div>
+            <div class="summary-label">Fundusz Pracy:</div>
+            <div id="zus-labor-fund" class="summary-value">0,00 PLN</div>
           </div>
           <div class="summary-row">
-            <div class="summary-label">FEP (Bridging Pensions Fund):</div>
-            <div id="zus-fep" class="summary-value">0.00 PLN</div>
+            <div class="summary-label">FEP (Fundusz Emerytur Pomostowych):</div>
+            <div id="zus-fep" class="summary-value">0,00 PLN</div>
           </div>
           <div class="summary-row">
-            <div class="summary-label">Health Insurance:</div>
-            <div id="zus-health" class="summary-value">0.00 PLN</div>
+            <div class="summary-label">Ubezpieczenie zdrowotne:</div>
+            <div id="zus-health" class="summary-value">0,00 PLN</div>
           </div>
           <div class="summary-row total-row">
-            <div class="summary-label">Total ZUS Due:</div>
-            <div id="zus-total" class="summary-value">0.00 PLN</div>
+            <div class="summary-label">Łączna kwota ZUS do zapłaty:</div>
+            <div id="zus-total" class="summary-value">0,00 PLN</div>
           </div>
         </div>
 
         <div class="summary-section">
-          <h3>Total Tax Burden</h3>
+          <h3>Łączne obciążenie podatkowe</h3>
           <div class="summary-row total-row">
-            <div class="summary-label">Total Monthly Tax Burden:</div>
-            <div id="total-tax-burden" class="summary-value">0.00 PLN</div>
+            <div class="summary-label">Łączne miesięczne obciążenie podatkowe:</div>
+            <div id="total-tax-burden" class="summary-value">0,00 PLN</div>
           </div>
-        </div>
-
-        <div class="disclaimer">
-          <h3>IMPORTANT DISCLAIMER</h3>
-          <p>These figures are estimates based on entered data and pre-set rules. They are provided for informational purposes only and should not be considered as financial or tax advice.</p>
-          <p>The user is solely responsible for verifying accuracy with official sources or an accountant before making any payments or submissions to tax authorities.</p>
-          <p>Tax laws and rates change frequently. Always consult with a qualified tax professional for your specific situation.</p>
         </div>
       </div>
+      <div class="card-footer">
+        <div class="disclaimer">
+          <h3><i class="fas fa-exclamation-triangle text-warning"></i> WAŻNE ZASTRZEŻENIE</h3>
+          <p>Przedstawione wartości są szacunkowe i oparte na wprowadzonych danych oraz predefiniowanych regułach. Służą wyłącznie celom informacyjnym i nie powinny być traktowane jako porady finansowe lub podatkowe.</p>
+          <p>Użytkownik ponosi wyłączną odpowiedzialność za weryfikację dokładności danych z oficjalnymi źródłami lub księgowym przed dokonaniem jakichkolwiek płatności lub zgłoszeń do organów podatkowych.</p>
+          <p>Przepisy podatkowe i stawki często ulegają zmianom. Zawsze konsultuj się z wykwalifikowanym doradcą podatkowym w swojej konkretnej sytuacji.</p>
+        </div>
+      </div>
+    </div>
     </section>
   </main>
 
   <footer class="text-center mt-3">
     <div class="container">
-      <p>&copy; 2025 Infirma - Accounting App</p>
+      <p>&copy; 2025 Infirma - Aplikacja księgowa dla polskich przedsiębiorców</p>
     </div>
   </footer>
+
+  <script>
+    // Add active class to current nav item
+    document.addEventListener('DOMContentLoaded', function() {
+      const currentPath = window.location.pathname;
+      const navLinks = document.querySelectorAll('nav ul li a');
+
+      navLinks.forEach(link => {
+        if (link.getAttribute('href') === currentPath) {
+          link.classList.add('active');
+        } else {
+          link.classList.remove('active');
+        }
+      });
+    });
+  </script>
 
   <script>
     document.addEventListener('DOMContentLoaded', function() {
@@ -493,7 +554,7 @@
       function displaySummary(data) {
         // Format currency
         const formatCurrency = (value) => {
-          return parseFloat(value).toFixed(2) + ' PLN';
+          return parseFloat(value).toFixed(2).replace('.', ',') + ' PLN';
         };
 
         // Income & Expenses
@@ -542,15 +603,10 @@
           return parseFloat(value).toFixed(2);
         };
 
-        // Format currency with "PLN" for display
-        const formatCurrency = (value) => {
-          return parseFloat(value).toFixed(2) + ' PLN';
-        };
-
         // Get month name
         const monthNames = [
-          'January', 'February', 'March', 'April', 'May', 'June',
-          'July', 'August', 'September', 'October', 'November', 'December'
+          'styczeń', 'luty', 'marzec', 'kwiecień', 'maj', 'czerwiec',
+          'lipiec', 'sierpień', 'wrzesień', 'październik', 'listopad', 'grudzień'
         ];
         const monthName = monthNames[parseInt(month) - 1];
 
@@ -558,7 +614,7 @@
         paymentMonthYear.textContent = `${monthName} ${year}`;
 
         // Set total amount
-        paymentTotalAmount.textContent = formatCurrency(data.total_tax_burden);
+        paymentTotalAmount.textContent = formatPolishCurrency(data.total_tax_burden);
 
         // Calculate payment deadlines
         const currentDate = new Date(year, month - 1, 1);
@@ -582,6 +638,11 @@
           return date.getDate() + ' ' + monthNames[date.getMonth()] + ' ' + date.getFullYear();
         };
 
+        // Format currency with comma instead of period
+        const formatPolishCurrency = (value) => {
+          return parseFloat(value).toFixed(2).replace('.', ',') + ' PLN';
+        };
+
         // Clear previous payment details
         paymentDetails.innerHTML = '';
 
@@ -599,29 +660,32 @@
           const healthInsurance = formatCurrencyValue(data.zus.health_insurance);
 
           const zusItem = document.createElement('div');
-          zusItem.className = 'payment-item';
+          zusItem.className = 'finance-item';
           zusItem.innerHTML = `
-            <div class="payment-item-left">
-              <div class="payment-item-title">
-                ZUS Contributions <span class="payment-period">${monthName} ${year}</span>
+            <div>
+              <div class="finance-item-title">
+                Składki ZUS <span class="status-badge status-pending">za ${monthName} ${year}</span>
               </div>
-              <div class="payment-item-details">
-                <div class="payment-breakdown">
-                  <div class="payment-breakdown-item">
-                    <span>Social Insurance:</span>
-                    <span>${socialInsurance} PLN</span>
-                  </div>
-                  <div class="payment-breakdown-item">
-                    <span>Health Insurance:</span>
-                    <span>${healthInsurance} PLN</span>
-                  </div>
+              <div class="finance-item-details">Składki na ubezpieczenia społeczne i zdrowotne</div>
+              <div class="finance-item-details text-warning">
+                <i class="fas fa-calendar-alt"></i> Termin płatności: ${formatDate(zusDeadline)}
+              </div>
+              <div class="payment-breakdown mt-3">
+                <div class="payment-breakdown-item">
+                  <span>Składki społeczne:</span>
+                  <span>${formatPolishCurrency(socialInsurance)}</span>
+                </div>
+                <div class="payment-breakdown-item">
+                  <span>Ubezpieczenie zdrowotne:</span>
+                  <span>${formatPolishCurrency(healthInsurance)}</span>
                 </div>
               </div>
             </div>
-            <div class="payment-item-amount">${zusTotal} PLN</div>
-            <div class="payment-item-deadline">Due: ${formatDate(zusDeadline)}</div>
-            <div class="payment-item-action">
-              <button class="btn pay-btn">Pay Now</button>
+            <div class="d-flex align-center gap-10">
+              <div class="finance-item-amount">${formatPolishCurrency(zusTotal)}</div>
+              <button class="btn btn-success btn-sm pay-btn">
+                <i class="fas fa-credit-card"></i> Opłać
+              </button>
             </div>
           `;
           paymentDetails.appendChild(zusItem);
@@ -630,20 +694,24 @@
         // Add PIT payment item
         if (data.pit.income_tax > 0) {
           const pitItem = document.createElement('div');
-          pitItem.className = 'payment-item';
+          pitItem.className = 'finance-item';
           pitItem.innerHTML = `
-            <div class="payment-item-left">
-              <div class="payment-item-title">
-                Income Tax (Ryczałt) <span class="payment-period">${monthName} ${year}</span>
+            <div>
+              <div class="finance-item-title">
+                Podatek dochodowy (Ryczałt) <span class="status-badge status-pending">za ${monthName} ${year}</span>
               </div>
-              <div class="payment-item-details">
-                Taxable income: ${formatCurrency(data.pit.taxable_income)} × ${(data.pit.income_tax_rate * 100)}% rate
+              <div class="finance-item-details">
+                Dochód do opodatkowania: ${formatPolishCurrency(data.pit.taxable_income)} × ${(data.pit.income_tax_rate * 100)}% stawka
+              </div>
+              <div class="finance-item-details text-warning">
+                <i class="fas fa-calendar-alt"></i> Termin płatności: ${formatDate(pitDeadline)}
               </div>
             </div>
-            <div class="payment-item-amount">${formatCurrency(data.pit.income_tax)}</div>
-            <div class="payment-item-deadline">Due: ${formatDate(pitDeadline)}</div>
-            <div class="payment-item-action">
-              <button class="btn pay-btn">Pay Now</button>
+            <div class="d-flex align-center gap-10">
+              <div class="finance-item-amount">${formatPolishCurrency(data.pit.income_tax)}</div>
+              <button class="btn btn-success btn-sm pay-btn">
+                <i class="fas fa-credit-card"></i> Opłać
+              </button>
             </div>
           `;
           paymentDetails.appendChild(pitItem);
@@ -652,29 +720,32 @@
         // Add VAT payment item
         if (data.vat.vat_due > 0) {
           const vatItem = document.createElement('div');
-          vatItem.className = 'payment-item';
+          vatItem.className = 'finance-item';
           vatItem.innerHTML = `
-            <div class="payment-item-left">
-              <div class="payment-item-title">
-                VAT <span class="payment-period">${monthName} ${year}</span>
+            <div>
+              <div class="finance-item-title">
+                Podatek VAT <span class="status-badge status-pending">za ${monthName} ${year}</span>
               </div>
-              <div class="payment-item-details">
-                <div class="payment-breakdown">
-                  <div class="payment-breakdown-item">
-                    <span>VAT Collected:</span>
-                    <span>${formatCurrency(data.vat.vat_collected)}</span>
-                  </div>
-                  <div class="payment-breakdown-item">
-                    <span>VAT Paid:</span>
-                    <span>${formatCurrency(data.vat.vat_paid)}</span>
-                  </div>
+              <div class="finance-item-details">VAT do zapłaty (VAT należny minus VAT naliczony)</div>
+              <div class="finance-item-details text-warning">
+                <i class="fas fa-calendar-alt"></i> Termin płatności: ${formatDate(vatDeadline)}
+              </div>
+              <div class="payment-breakdown mt-3">
+                <div class="payment-breakdown-item">
+                  <span>VAT należny:</span>
+                  <span>${formatPolishCurrency(data.vat.vat_collected)}</span>
+                </div>
+                <div class="payment-breakdown-item">
+                  <span>VAT naliczony:</span>
+                  <span>${formatPolishCurrency(data.vat.vat_paid)}</span>
                 </div>
               </div>
             </div>
-            <div class="payment-item-amount">${formatCurrency(data.vat.vat_due)}</div>
-            <div class="payment-item-deadline">Due: ${formatDate(vatDeadline)}</div>
-            <div class="payment-item-action">
-              <button class="btn pay-btn">Pay Now</button>
+            <div class="d-flex align-center gap-10">
+              <div class="finance-item-amount">${formatPolishCurrency(data.vat.vat_due)}</div>
+              <button class="btn btn-success btn-sm pay-btn">
+                <i class="fas fa-credit-card"></i> Opłać
+              </button>
             </div>
           `;
           paymentDetails.appendChild(vatItem);
@@ -695,28 +766,14 @@
 
       // Function to show messages
       function showMessage(type, message) {
-        messageContainer.innerHTML = `<div class="${type === 'error' ? 'error' : 'success'}">${message}</div>`;
-        messageContainer.style.display = 'block';
-
-        // Add some basic styling for messages
-        const style = document.createElement('style');
-        style.textContent = `
-          .success {
-            background-color: #d4edda;
-            color: #155724;
-            padding: 10px;
-            border-radius: 4px;
-            margin-bottom: 15px;
-          }
-          .error {
-            background-color: #f8d7da;
-            color: #721c24;
-            padding: 10px;
-            border-radius: 4px;
-            margin-bottom: 15px;
-          }
+        messageContainer.innerHTML = `
+          <div class="card mb-3">
+            <div class="card-body ${type === 'error' ? 'text-warning' : 'text-success'}">
+              <i class="fas ${type === 'error' ? 'fa-exclamation-circle' : 'fa-check-circle'}"></i> ${message}
+            </div>
+          </div>
         `;
-        document.head.appendChild(style);
+        messageContainer.style.display = 'block';
 
         // Auto-hide success message after 3 seconds
         if (type === 'success') {
