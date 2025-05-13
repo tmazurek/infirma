@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Expenses - Infirma</title>
   <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
     .expense-list {
       margin-top: 20px;
@@ -73,75 +74,108 @@
 </head>
 <body>
   <header>
-    <div class="container">
-      <h1>Infirma</h1>
-      <nav>
-        <ul>
-          <li><a href="/">Home</a></li>
-          <li><a href="/company-profile">Company Profile</a></li>
-          <li><a href="/clients">Clients</a></li>
-          <li><a href="/invoices">Invoices</a></li>
-          <li><a href="/expenses">Expenses</a></li>
-          <li><a href="/summary">Summary</a></li>
-        </ul>
-      </nav>
+    <div class="container header-container">
+      <div class="d-flex align-center">
+        <img src="https://via.placeholder.com/32x32/0078d4/ffffff?text=I" alt="Infirma Logo" class="logo">
+        <h1>Infirma</h1>
+        <span class="premium-button">Odbierz 500 PLN</span>
+      </div>
+      <div class="user-menu">
+        <i class="fas fa-search icon"></i>
+        <i class="far fa-bell icon"></i>
+        <i class="far fa-folder icon"></i>
+        <i class="fas fa-cog icon"></i>
+        <div class="user-profile">
+          <span>tmazurek@outlook.com</span>
+          <i class="fas fa-chevron-down"></i>
+        </div>
+      </div>
     </div>
+    <nav>
+      <div class="container">
+        <ul>
+          <li><a href="/">Przychody</a></li>
+          <li><a href="/expenses" class="active">Koszty</a></li>
+          <li><a href="/summary">Księgowość</a></li>
+          <li><a href="/company-profile">Firma</a></li>
+          <li><a href="/clients">Klienci</a></li>
+          <li><a href="/invoices">Faktury</a></li>
+        </ul>
+      </div>
+    </nav>
   </header>
 
   <main class="container">
-    <section class="mt-3">
-      <h2>Expenses</h2>
-      <p>Track and manage your business expenses.</p>
+    <div class="dashboard-greeting">
+      <div class="greeting-text">
+        <h1>Koszty</h1>
+      </div>
+      <div class="action-buttons">
+        <button class="action-button primary" id="add-expense-btn">
+          <i class="fas fa-plus"></i> Dodaj nowy koszt
+        </button>
+      </div>
+    </div>
 
-      <div id="message-container" class="mb-3" style="display: none;"></div>
+    <div id="message-container" class="mb-3" style="display: none;"></div>
 
-      <div class="filters">
-        <h3>Filters</h3>
+    <div class="card mb-3">
+      <div class="card-header">
+        <h2>Filtry</h2>
+      </div>
+      <div class="card-body">
         <form id="filter-form">
           <div class="filters-row">
             <div class="filter-group">
-              <label for="start-date">Start Date</label>
+              <label for="start-date">Data początkowa</label>
               <input type="date" id="start-date" name="startDate">
             </div>
             <div class="filter-group">
-              <label for="end-date">End Date</label>
+              <label for="end-date">Data końcowa</label>
               <input type="date" id="end-date" name="endDate">
             </div>
             <div class="filter-group">
-              <label for="category">Category</label>
+              <label for="category">Kategoria</label>
               <select id="category" name="category">
-                <option value="">All Categories</option>
+                <option value="">Wszystkie kategorie</option>
                 <!-- Categories will be added here dynamically -->
               </select>
             </div>
           </div>
-          <button type="submit" class="btn">Apply Filters</button>
-          <button type="button" id="clear-filters-btn" class="btn" style="background-color: #6c757d;">Clear Filters</button>
+          <div class="d-flex gap-10 mt-3">
+            <button type="submit" class="btn">Zastosuj filtry</button>
+            <button type="button" id="clear-filters-btn" class="btn-outline btn">Wyczyść filtry</button>
+          </div>
         </form>
       </div>
+    </div>
 
-      <button id="add-expense-btn" class="btn mb-3">Add New Expense</button>
-
-      <div class="expense-list">
-        <table id="expenses-table">
-          <thead>
-            <tr>
-              <th>Date</th>
-              <th>Vendor</th>
-              <th>Description</th>
-              <th>Category</th>
-              <th>Net Amount</th>
-              <th>VAT</th>
-              <th>Gross Amount</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody id="expenses-table-body">
-            <!-- Expense rows will be added here dynamically -->
-          </tbody>
-        </table>
+    <div class="card">
+      <div class="card-header">
+        <h2>Lista kosztów</h2>
       </div>
-    </section>
+      <div class="card-body">
+        <div class="expense-list">
+          <table id="expenses-table">
+            <thead>
+              <tr>
+                <th>Data</th>
+                <th>Sprzedawca</th>
+                <th>Opis</th>
+                <th>Kategoria</th>
+                <th>Kwota netto</th>
+                <th>VAT</th>
+                <th>Kwota brutto</th>
+                <th>Akcje</th>
+              </tr>
+            </thead>
+            <tbody id="expenses-table-body">
+              <!-- Expense rows will be added here dynamically -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
   </main>
 
   <!-- Expense Modal Form -->
@@ -211,9 +245,25 @@
 
   <footer class="text-center mt-3">
     <div class="container">
-      <p>&copy; 2025 Infirma - Accounting App</p>
+      <p>&copy; 2025 Infirma - Aplikacja księgowa dla polskich przedsiębiorców</p>
     </div>
   </footer>
+
+  <script>
+    // Add active class to current nav item
+    document.addEventListener('DOMContentLoaded', function() {
+      const currentPath = window.location.pathname;
+      const navLinks = document.querySelectorAll('nav ul li a');
+
+      navLinks.forEach(link => {
+        if (link.getAttribute('href') === currentPath) {
+          link.classList.add('active');
+        } else {
+          link.classList.remove('active');
+        }
+      });
+    });
+  </script>
 
   <script>
     document.addEventListener('DOMContentLoaded', function() {
@@ -519,28 +569,14 @@
 
       // Function to show messages
       function showMessage(type, message) {
-        messageContainer.innerHTML = `<div class="${type === 'error' ? 'error' : 'success'}">${message}</div>`;
-        messageContainer.style.display = 'block';
-
-        // Add some basic styling for messages
-        const style = document.createElement('style');
-        style.textContent = `
-          .success {
-            background-color: #d4edda;
-            color: #155724;
-            padding: 10px;
-            border-radius: 4px;
-            margin-bottom: 15px;
-          }
-          .error {
-            background-color: #f8d7da;
-            color: #721c24;
-            padding: 10px;
-            border-radius: 4px;
-            margin-bottom: 15px;
-          }
+        messageContainer.innerHTML = `
+          <div class="card mb-3">
+            <div class="card-body ${type === 'error' ? 'text-warning' : 'text-success'}">
+              <i class="fas ${type === 'error' ? 'fa-exclamation-circle' : 'fa-check-circle'}"></i> ${message}
+            </div>
+          </div>
         `;
-        document.head.appendChild(style);
+        messageContainer.style.display = 'block';
 
         // Auto-hide message after 5 seconds
         setTimeout(() => {
