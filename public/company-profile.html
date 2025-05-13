@@ -30,44 +30,173 @@
 
       <div id="message-container" class="mb-3" style="display: none;"></div>
 
-      <form id="company-profile-form" class="mb-3">
-        <div class="form-group">
-          <label for="company_name">Company Name *</label>
-          <input type="text" id="company_name" name="company_name" required>
-        </div>
+      <div class="tabs">
+        <ul class="tab-nav">
+          <li class="tab-item active" data-tab="company-info">Company Info</li>
+          <li class="tab-item" data-tab="zus-settings">ZUS Settings</li>
+        </ul>
 
-        <div class="form-group">
-          <label for="nip">NIP (Tax ID) *</label>
-          <input type="text" id="nip" name="nip" required pattern="[0-9]{10}" title="NIP must be 10 digits">
-        </div>
+        <form id="company-profile-form" class="mb-3">
+          <!-- Company Info Tab -->
+          <div id="company-info" class="tab-content active">
+            <div class="form-group">
+              <label for="company_name">Company Name *</label>
+              <input type="text" id="company_name" name="company_name" required>
+            </div>
 
-        <div class="form-group">
-          <label for="street_address">Street Address</label>
-          <input type="text" id="street_address" name="street_address">
-        </div>
+            <div class="form-group">
+              <label for="nip">NIP (Tax ID) *</label>
+              <input type="text" id="nip" name="nip" required pattern="[0-9]{10}" title="NIP must be 10 digits">
+            </div>
 
-        <div class="form-group">
-          <label for="city">City</label>
-          <input type="text" id="city" name="city">
-        </div>
+            <div class="form-group">
+              <label for="street_address">Street Address</label>
+              <input type="text" id="street_address" name="street_address">
+            </div>
 
-        <div class="form-group">
-          <label for="postal_code">Postal Code</label>
-          <input type="text" id="postal_code" name="postal_code" pattern="[0-9]{2}-[0-9]{3}" title="Format: 00-000">
-        </div>
+            <div class="form-group">
+              <label for="city">City</label>
+              <input type="text" id="city" name="city">
+            </div>
 
-        <div class="form-group">
-          <label for="bank_account_number">Bank Account Number</label>
-          <input type="text" id="bank_account_number" name="bank_account_number">
-        </div>
+            <div class="form-group">
+              <label for="postal_code">Postal Code</label>
+              <input type="text" id="postal_code" name="postal_code" pattern="[0-9]{2}-[0-9]{3}" title="Format: 00-000">
+            </div>
 
-        <div class="form-group">
-          <label for="default_vat_rate">Default VAT Rate (%)</label>
-          <input type="number" id="default_vat_rate" name="default_vat_rate" min="0" max="100" step="1" value="23">
-        </div>
+            <div class="form-group">
+              <label for="bank_account_number">Bank Account Number</label>
+              <input type="text" id="bank_account_number" name="bank_account_number">
+            </div>
 
-        <button type="submit" class="btn">Save Company Profile</button>
-      </form>
+            <div class="form-group">
+              <label for="default_vat_rate">Default VAT Rate (%)</label>
+              <input type="number" id="default_vat_rate" name="default_vat_rate" min="0" max="100" step="1" value="23">
+            </div>
+          </div>
+
+          <!-- ZUS Settings Tab -->
+          <div id="zus-settings" class="tab-content">
+            <h3>ZUS Contribution Settings</h3>
+            <p>Configure your ZUS (Social Security) contribution rates and amounts.</p>
+
+            <div class="form-group">
+              <label for="zus_base_amount">Base Amount (PLN)</label>
+              <input type="number" id="zus_base_amount" name="zus_base_amount" min="0" step="0.01" value="5203.80">
+              <small>The base amount used for calculating ZUS contributions (e.g., 5203.80 PLN for 2025)</small>
+            </div>
+
+            <div class="form-group">
+              <label for="zus_retirement_rate">Retirement Insurance Rate (%)</label>
+              <input type="number" id="zus_retirement_rate" name="zus_retirement_rate" min="0" max="100" step="0.01" value="19.52">
+              <small>Default: 19.52%</small>
+            </div>
+
+            <div class="form-group">
+              <label for="zus_disability_rate">Disability Insurance Rate (%)</label>
+              <input type="number" id="zus_disability_rate" name="zus_disability_rate" min="0" max="100" step="0.01" value="8.0">
+              <small>Default: 8.0%</small>
+            </div>
+
+            <div class="form-group">
+              <label for="zus_accident_rate">Accident Insurance Rate (%)</label>
+              <input type="number" id="zus_accident_rate" name="zus_accident_rate" min="0" max="100" step="0.01" value="1.67">
+              <small>Default: 1.67%</small>
+            </div>
+
+            <div class="form-group">
+              <label for="zus_sickness_rate">Sickness Insurance Rate (%)</label>
+              <input type="number" id="zus_sickness_rate" name="zus_sickness_rate" min="0" max="100" step="0.01" value="2.45">
+              <small>Default: 2.45%</small>
+            </div>
+
+            <div class="form-group">
+              <label for="zus_labor_fund_rate">Labor Fund Rate (%)</label>
+              <input type="number" id="zus_labor_fund_rate" name="zus_labor_fund_rate" min="0" max="100" step="0.01" value="2.45">
+              <small>Default: 2.45%</small>
+            </div>
+
+            <div class="form-group">
+              <label for="zus_fep_rate">FEP (Bridging Pensions Fund) Rate (%)</label>
+              <input type="number" id="zus_fep_rate" name="zus_fep_rate" min="0" max="100" step="0.01" value="0.1">
+              <small>Default: 0.1%</small>
+            </div>
+
+            <div class="form-group">
+              <label for="zus_health_insurance_amount">Health Insurance Amount (PLN)</label>
+              <input type="number" id="zus_health_insurance_amount" name="zus_health_insurance_amount" min="0" step="0.01" value="0">
+              <small>Enter a fixed amount, or leave as 0 to use the default calculation</small>
+            </div>
+
+            <div class="zus-summary">
+              <h4>Calculated Monthly Contributions</h4>
+              <div id="zus-calculation-results">
+                <!-- Results will be displayed here -->
+              </div>
+            </div>
+          </div>
+
+          <button type="submit" class="btn">Save Company Profile</button>
+        </form>
+      </div>
+
+      <style>
+        /* Tab Styles */
+        .tabs {
+          width: 100%;
+        }
+
+        .tab-nav {
+          display: flex;
+          list-style: none;
+          padding: 0;
+          margin-bottom: 20px;
+          border-bottom: 1px solid #ddd;
+        }
+
+        .tab-item {
+          padding: 10px 20px;
+          cursor: pointer;
+          margin-right: 5px;
+          border: 1px solid #ddd;
+          border-bottom: none;
+          border-radius: 5px 5px 0 0;
+          background-color: #f8f9fa;
+        }
+
+        .tab-item.active {
+          background-color: #fff;
+          border-bottom: 1px solid #fff;
+          margin-bottom: -1px;
+          font-weight: bold;
+        }
+
+        .tab-content {
+          display: none;
+          padding: 20px;
+          border: 1px solid #ddd;
+          border-top: none;
+          border-radius: 0 0 5px 5px;
+        }
+
+        .tab-content.active {
+          display: block;
+        }
+
+        /* Form Styles */
+        small {
+          display: block;
+          color: #6c757d;
+          margin-top: 5px;
+        }
+
+        .zus-summary {
+          margin-top: 20px;
+          padding: 15px;
+          background-color: #f8f9fa;
+          border-radius: 5px;
+        }
+      </style>
     </section>
   </main>
 
@@ -81,6 +210,30 @@
     document.addEventListener('DOMContentLoaded', function() {
       const form = document.getElementById('company-profile-form');
       const messageContainer = document.getElementById('message-container');
+      const tabItems = document.querySelectorAll('.tab-item');
+      const tabContents = document.querySelectorAll('.tab-content');
+      const zusCalculationResults = document.getElementById('zus-calculation-results');
+
+      // Handle tab switching
+      tabItems.forEach(item => {
+        item.addEventListener('click', function() {
+          // Remove active class from all tabs
+          tabItems.forEach(tab => tab.classList.remove('active'));
+          tabContents.forEach(content => content.classList.remove('active'));
+
+          // Add active class to clicked tab
+          this.classList.add('active');
+
+          // Show corresponding content
+          const tabId = this.getAttribute('data-tab');
+          document.getElementById(tabId).classList.add('active');
+
+          // If switching to ZUS tab, calculate and display ZUS contributions
+          if (tabId === 'zus-settings') {
+            calculateZusContributions();
+          }
+        });
+      });
 
       // Fetch existing company profile data
       fetchCompanyProfile();
@@ -89,6 +242,22 @@
       form.addEventListener('submit', function(e) {
         e.preventDefault();
         saveCompanyProfile();
+      });
+
+      // Add input event listeners to ZUS fields for real-time calculation
+      const zusFields = [
+        'zus_base_amount',
+        'zus_retirement_rate',
+        'zus_disability_rate',
+        'zus_accident_rate',
+        'zus_sickness_rate',
+        'zus_labor_fund_rate',
+        'zus_fep_rate',
+        'zus_health_insurance_amount'
+      ];
+
+      zusFields.forEach(fieldId => {
+        document.getElementById(fieldId).addEventListener('input', calculateZusContributions);
       });
 
       // Function to fetch company profile
@@ -106,7 +275,7 @@
           })
           .then(data => {
             if (data) {
-              // Populate form with existing data
+              // Populate form with existing data - Company Info
               document.getElementById('company_name').value = data.company_name || '';
               document.getElementById('nip').value = data.nip || '';
               document.getElementById('street_address').value = data.street_address || '';
@@ -114,6 +283,19 @@
               document.getElementById('postal_code').value = data.postal_code || '';
               document.getElementById('bank_account_number').value = data.bank_account_number || '';
               document.getElementById('default_vat_rate').value = data.default_vat_rate || 23;
+
+              // Populate ZUS settings
+              document.getElementById('zus_base_amount').value = data.zus_base_amount || 5203.80;
+              document.getElementById('zus_retirement_rate').value = data.zus_retirement_rate || 19.52;
+              document.getElementById('zus_disability_rate').value = data.zus_disability_rate || 8.0;
+              document.getElementById('zus_accident_rate').value = data.zus_accident_rate || 1.67;
+              document.getElementById('zus_sickness_rate').value = data.zus_sickness_rate || 2.45;
+              document.getElementById('zus_labor_fund_rate').value = data.zus_labor_fund_rate || 2.45;
+              document.getElementById('zus_fep_rate').value = data.zus_fep_rate || 0.1;
+              document.getElementById('zus_health_insurance_amount').value = data.zus_health_insurance_amount || 0;
+
+              // Calculate ZUS contributions
+              calculateZusContributions();
             }
           })
           .catch(error => {
@@ -130,7 +312,15 @@
           city: document.getElementById('city').value,
           postal_code: document.getElementById('postal_code').value,
           bank_account_number: document.getElementById('bank_account_number').value,
-          default_vat_rate: document.getElementById('default_vat_rate').value
+          default_vat_rate: document.getElementById('default_vat_rate').value,
+          zus_base_amount: document.getElementById('zus_base_amount').value,
+          zus_retirement_rate: document.getElementById('zus_retirement_rate').value,
+          zus_disability_rate: document.getElementById('zus_disability_rate').value,
+          zus_accident_rate: document.getElementById('zus_accident_rate').value,
+          zus_sickness_rate: document.getElementById('zus_sickness_rate').value,
+          zus_labor_fund_rate: document.getElementById('zus_labor_fund_rate').value,
+          zus_fep_rate: document.getElementById('zus_fep_rate').value,
+          zus_health_insurance_amount: document.getElementById('zus_health_insurance_amount').value
         };
 
         fetch('/api/company-profile', {
@@ -154,6 +344,80 @@
         .catch(error => {
           showMessage('error', error.message);
         });
+      }
+
+      // Function to calculate ZUS contributions
+      function calculateZusContributions() {
+        const baseAmount = parseFloat(document.getElementById('zus_base_amount').value) || 5203.80;
+        const retirementRate = parseFloat(document.getElementById('zus_retirement_rate').value) || 19.52;
+        const disabilityRate = parseFloat(document.getElementById('zus_disability_rate').value) || 8.0;
+        const accidentRate = parseFloat(document.getElementById('zus_accident_rate').value) || 1.67;
+        const sicknessRate = parseFloat(document.getElementById('zus_sickness_rate').value) || 2.45;
+        const laborFundRate = parseFloat(document.getElementById('zus_labor_fund_rate').value) || 2.45;
+        const fepRate = parseFloat(document.getElementById('zus_fep_rate').value) || 0.1;
+        const healthInsuranceAmount = parseFloat(document.getElementById('zus_health_insurance_amount').value) || 0;
+
+        // Calculate contributions
+        const retirement = (baseAmount * retirementRate / 100).toFixed(2);
+        const disability = (baseAmount * disabilityRate / 100).toFixed(2);
+        const accident = (baseAmount * accidentRate / 100).toFixed(2);
+        const sickness = (baseAmount * sicknessRate / 100).toFixed(2);
+        const laborFund = (baseAmount * laborFundRate / 100).toFixed(2);
+        const fep = (baseAmount * fepRate / 100).toFixed(2);
+
+        // Use custom health insurance amount if provided, otherwise calculate as 9% of 75% of base amount
+        const healthInsurance = healthInsuranceAmount > 0
+          ? healthInsuranceAmount.toFixed(2)
+          : (baseAmount * 0.75 * 0.09).toFixed(2);
+
+        // Calculate total
+        const socialInsuranceTotal = parseFloat(retirement) + parseFloat(disability) +
+                                    parseFloat(accident) + parseFloat(sickness) +
+                                    parseFloat(laborFund) + parseFloat(fep);
+
+        const total = socialInsuranceTotal + parseFloat(healthInsurance);
+
+        // Display results
+        zusCalculationResults.innerHTML = `
+          <table style="width: 100%;">
+            <tr>
+              <td><strong>Retirement Insurance:</strong></td>
+              <td style="text-align: right;">${retirement} PLN</td>
+            </tr>
+            <tr>
+              <td><strong>Disability Insurance:</strong></td>
+              <td style="text-align: right;">${disability} PLN</td>
+            </tr>
+            <tr>
+              <td><strong>Accident Insurance:</strong></td>
+              <td style="text-align: right;">${accident} PLN</td>
+            </tr>
+            <tr>
+              <td><strong>Sickness Insurance:</strong></td>
+              <td style="text-align: right;">${sickness} PLN</td>
+            </tr>
+            <tr>
+              <td><strong>Labor Fund:</strong></td>
+              <td style="text-align: right;">${laborFund} PLN</td>
+            </tr>
+            <tr>
+              <td><strong>FEP (Bridging Pensions Fund):</strong></td>
+              <td style="text-align: right;">${fep} PLN</td>
+            </tr>
+            <tr>
+              <td><strong>Social Insurance Total:</strong></td>
+              <td style="text-align: right;">${socialInsuranceTotal.toFixed(2)} PLN</td>
+            </tr>
+            <tr>
+              <td><strong>Health Insurance:</strong></td>
+              <td style="text-align: right;">${healthInsurance} PLN</td>
+            </tr>
+            <tr style="font-weight: bold; border-top: 1px solid #ddd;">
+              <td><strong>TOTAL ZUS MONTHLY PAYMENT:</strong></td>
+              <td style="text-align: right;">${total.toFixed(2)} PLN</td>
+            </tr>
+          </table>
+        `;
       }
 
       // Function to show messages

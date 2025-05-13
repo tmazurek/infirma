@@ -30,6 +30,14 @@ function initializeDatabase() {
       postal_code TEXT,
       bank_account_number TEXT,
       default_vat_rate REAL DEFAULT 23.0,
+      zus_base_amount REAL DEFAULT 5203.80,
+      zus_retirement_rate REAL DEFAULT 19.52,
+      zus_disability_rate REAL DEFAULT 8.0,
+      zus_accident_rate REAL DEFAULT 1.67,
+      zus_sickness_rate REAL DEFAULT 2.45,
+      zus_labor_fund_rate REAL DEFAULT 2.45,
+      zus_fep_rate REAL DEFAULT 0.1,
+      zus_health_insurance_amount REAL DEFAULT 0.0,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
       updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );

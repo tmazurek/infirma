@@ -154,20 +154,74 @@ function calculatePIT(month, year, callback) {
  * @param {Function} callback - Callback function(err, result)
  */
 function calculateZUS(month, year, callback) {
-  // ZUS contributions are fixed monthly amounts
-  const zusContributions = {
-    social_insurance: {
-      retirement: TAX_RATES.ZUS.SOCIAL_INSURANCE.RETIREMENT,
-      disability: TAX_RATES.ZUS.SOCIAL_INSURANCE.DISABILITY,
-      sickness: TAX_RATES.ZUS.SOCIAL_INSURANCE.SICKNESS,
-      accident: TAX_RATES.ZUS.SOCIAL_INSURANCE.ACCIDENT,
-      labor_fund: TAX_RATES.ZUS.SOCIAL_INSURANCE.LABOR_FUND
-    },
-    health_insurance: TAX_RATES.ZUS.HEALTH_INSURANCE,
-    total: TAX_RATES.ZUS.TOTAL
-  };
+  // Get company profile to use custom ZUS rates if available
+  const sql = 'SELECT * FROM CompanyProfile LIMIT 1';
 
-  callback(null, zusContributions);
+  db.get(sql, [], (err, profile) => {
+    if (err) {
+      return callback(err, null);
+    }
+
+    let zusContributions;
+
+    if (profile) {
+      // Calculate ZUS using custom rates from company profile
+      const baseAmount = profile.zus_base_amount || 5203.80;
+      const retirementRate = profile.zus_retirement_rate || 19.52;
+      const disabilityRate = profile.zus_disability_rate || 8.0;
+      const accidentRate = profile.zus_accident_rate || 1.67;
+      const sicknessRate = profile.zus_sickness_rate || 2.45;
+      const laborFundRate = profile.zus_labor_fund_rate || 2.45;
+      const fepRate = profile.zus_fep_rate || 0.1;
+
+      // Calculate contributions
+      const retirement = (baseAmount * retirementRate / 100).toFixed(2) * 1;
+      const disability = (baseAmount * disabilityRate / 100).toFixed(2) * 1;
+      const accident = (baseAmount * accidentRate / 100).toFixed(2) * 1;
+      const sickness = (baseAmount * sicknessRate / 100).toFixed(2) * 1;
+      const laborFund = (baseAmount * laborFundRate / 100).toFixed(2) * 1;
+      const fep = (baseAmount * fepRate / 100).toFixed(2) * 1;
+
+      // Use custom health insurance amount if provided, otherwise use default
+      const healthInsurance = profile.zus_health_insurance_amount > 0
+        ? profile.zus_health_insurance_amount
+        : TAX_RATES.ZUS.HEALTH_INSURANCE;
+
+      // Calculate total
+      const total = retirement + disability + accident + sickness + laborFund + fep + healthInsurance;
+
+      zusContributions = {
+        social_insurance: {
+          retirement,
+          disability,
+          sickness,
+          accident,
+          labor_fund: laborFund,
+          fep
+        },
+        health_insurance: healthInsurance,
+        total,
+        base_amount: baseAmount
+      };
+    } else {
+      // Use default rates
+      zusContributions = {
+        social_insurance: {
+          retirement: TAX_RATES.ZUS.SOCIAL_INSURANCE.RETIREMENT,
+          disability: TAX_RATES.ZUS.SOCIAL_INSURANCE.DISABILITY,
+          sickness: TAX_RATES.ZUS.SOCIAL_INSURANCE.SICKNESS,
+          accident: TAX_RATES.ZUS.SOCIAL_INSURANCE.ACCIDENT,
+          labor_fund: TAX_RATES.ZUS.SOCIAL_INSURANCE.LABOR_FUND,
+          fep: TAX_RATES.ZUS.SOCIAL_INSURANCE.FEP
+        },
+        health_insurance: TAX_RATES.ZUS.HEALTH_INSURANCE,
+        total: TAX_RATES.ZUS.TOTAL,
+        base_amount: 4694.94
+      };
+    }
+
+    callback(null, zusContributions);
+  });
 }
 
 /**

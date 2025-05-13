@@ -10,11 +10,11 @@ router.get('/', (req, res) => {
       console.error('Error retrieving company profile:', err);
       return res.status(500).json({ error: 'Failed to retrieve company profile' });
     }
-    
+
     if (!profile) {
       return res.status(404).json({ message: 'No company profile found' });
     }
-    
+
     res.json(profile);
   });
 });
@@ -29,20 +29,28 @@ router.post('/', (req, res) => {
     city: req.body.city,
     postal_code: req.body.postal_code,
     bank_account_number: req.body.bank_account_number,
-    default_vat_rate: req.body.default_vat_rate
+    default_vat_rate: req.body.default_vat_rate,
+    zus_base_amount: req.body.zus_base_amount,
+    zus_retirement_rate: req.body.zus_retirement_rate,
+    zus_disability_rate: req.body.zus_disability_rate,
+    zus_accident_rate: req.body.zus_accident_rate,
+    zus_sickness_rate: req.body.zus_sickness_rate,
+    zus_labor_fund_rate: req.body.zus_labor_fund_rate,
+    zus_fep_rate: req.body.zus_fep_rate,
+    zus_health_insurance_amount: req.body.zus_health_insurance_amount
   };
-  
+
   CompanyProfile.saveProfile(profileData, (err, savedProfile) => {
     if (err) {
       console.error('Error saving company profile:', err);
-      
+
       if (err.message === 'Company name and NIP are required') {
         return res.status(400).json({ error: err.message });
       }
-      
+
       return res.status(500).json({ error: 'Failed to save company profile' });
     }
-    
+
     res.status(200).json({
       message: 'Company profile saved successfully',
       profile: savedProfile
