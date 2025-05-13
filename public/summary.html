@@ -82,9 +82,9 @@
     <section class="mt-3">
       <h2>Monthly Financial Summary</h2>
       <p>View estimated tax obligations based on your recorded financial data.</p>
-      
+
       <div id="message-container" class="mb-3" style="display: none;"></div>
-      
+
       <div class="date-selector">
         <div class="form-group">
           <label for="month">Month</label>
@@ -103,17 +103,17 @@
             <option value="12">December</option>
           </select>
         </div>
-        
+
         <div class="form-group">
           <label for="year">Year</label>
           <select id="year" name="year">
             <!-- Years will be added dynamically -->
           </select>
         </div>
-        
+
         <button id="generate-btn" class="btn">Generate Summary</button>
       </div>
-      
+
       <div id="summary-container" class="summary-container">
         <div class="summary-section">
           <h3>Income & Expenses</h3>
@@ -126,7 +126,7 @@
             <div id="expenses" class="summary-value">0.00 PLN</div>
           </div>
         </div>
-        
+
         <div class="summary-section">
           <h3>VAT</h3>
           <div class="summary-row">
@@ -142,7 +142,7 @@
             <div id="vat-due" class="summary-value">0.00 PLN</div>
           </div>
         </div>
-        
+
         <div class="summary-section">
           <h3>Income Tax (Ryczałt 12%)</h3>
           <div class="summary-row">
@@ -158,7 +158,7 @@
             <div id="income-tax" class="summary-value">0.00 PLN</div>
           </div>
         </div>
-        
+
         <div class="summary-section">
           <h3>ZUS (Social Security)</h3>
           <div class="summary-row">
@@ -182,6 +182,10 @@
             <div id="zus-labor-fund" class="summary-value">0.00 PLN</div>
           </div>
           <div class="summary-row">
+            <div class="summary-label">FEP (Bridging Pensions Fund):</div>
+            <div id="zus-fep" class="summary-value">0.00 PLN</div>
+          </div>
+          <div class="summary-row">
             <div class="summary-label">Health Insurance:</div>
             <div id="zus-health" class="summary-value">0.00 PLN</div>
           </div>
@@ -190,7 +194,7 @@
             <div id="zus-total" class="summary-value">0.00 PLN</div>
           </div>
         </div>
-        
+
         <div class="summary-section">
           <h3>Total Tax Burden</h3>
           <div class="summary-row total-row">
@@ -198,7 +202,7 @@
             <div id="total-tax-burden" class="summary-value">0.00 PLN</div>
           </div>
         </div>
-        
+
         <div class="disclaimer">
           <h3>IMPORTANT DISCLAIMER</h3>
           <p>These figures are estimates based on entered data and pre-set rules. They are provided for informational purposes only and should not be considered as financial or tax advice.</p>
@@ -223,7 +227,7 @@
       const generateBtn = document.getElementById('generate-btn');
       const summaryContainer = document.getElementById('summary-container');
       const messageContainer = document.getElementById('message-container');
-      
+
       // Populate year select with current year and previous 5 years
       const currentYear = new Date().getFullYear();
       for (let year = currentYear; year >= currentYear - 5; year--) {
@@ -232,24 +236,24 @@
         option.textContent = year;
         yearSelect.appendChild(option);
       }
-      
+
       // Set default month to current month
       const currentMonth = new Date().getMonth() + 1; // JavaScript months are 0-indexed
       monthSelect.value = currentMonth;
-      
+
       // Generate button click
       generateBtn.addEventListener('click', function() {
         const month = monthSelect.value;
         const year = yearSelect.value;
-        
+
         generateSummary(month, year);
       });
-      
+
       // Function to generate financial summary
       function generateSummary(month, year) {
         // Show loading message
         showMessage('success', 'Generating summary...');
-        
+
         fetch(`/api/financial-summary?month=${month}&year=${year}`)
           .then(response => {
             if (!response.ok) {
@@ -267,49 +271,50 @@
             showMessage('error', error.message);
           });
       }
-      
+
       // Function to display financial summary
       function displaySummary(data) {
         // Format currency
         const formatCurrency = (value) => {
           return parseFloat(value).toFixed(2) + ' PLN';
         };
-        
+
         // Income & Expenses
         document.getElementById('income').textContent = formatCurrency(data.pit.income);
         document.getElementById('expenses').textContent = formatCurrency(data.pit.expenses);
-        
+
         // VAT
         document.getElementById('vat-collected').textContent = formatCurrency(data.vat.vat_collected);
         document.getElementById('vat-paid').textContent = formatCurrency(data.vat.vat_paid);
         document.getElementById('vat-due').textContent = formatCurrency(data.vat.vat_due);
-        
+
         // Income Tax
         document.getElementById('taxable-income').textContent = formatCurrency(data.pit.taxable_income);
         document.getElementById('tax-rate').textContent = (data.pit.income_tax_rate * 100) + '%';
         document.getElementById('income-tax').textContent = formatCurrency(data.pit.income_tax);
-        
+
         // ZUS
         document.getElementById('zus-retirement').textContent = formatCurrency(data.zus.social_insurance.retirement);
         document.getElementById('zus-disability').textContent = formatCurrency(data.zus.social_insurance.disability);
         document.getElementById('zus-sickness').textContent = formatCurrency(data.zus.social_insurance.sickness);
         document.getElementById('zus-accident').textContent = formatCurrency(data.zus.social_insurance.accident);
         document.getElementById('zus-labor-fund').textContent = formatCurrency(data.zus.social_insurance.labor_fund);
+        document.getElementById('zus-fep').textContent = formatCurrency(data.zus.social_insurance.fep);
         document.getElementById('zus-health').textContent = formatCurrency(data.zus.health_insurance);
         document.getElementById('zus-total').textContent = formatCurrency(data.zus.total);
-        
+
         // Total Tax Burden
         document.getElementById('total-tax-burden').textContent = formatCurrency(data.total_tax_burden);
-        
+
         // Show summary container
         summaryContainer.style.display = 'block';
       }
-      
+
       // Function to show messages
       function showMessage(type, message) {
         messageContainer.innerHTML = `<div class="${type === 'error' ? 'error' : 'success'}">${message}</div>`;
         messageContainer.style.display = 'block';
-        
+
         // Add some basic styling for messages
         const style = document.createElement('style');
         style.textContent = `
@@ -329,7 +334,7 @@
           }
         `;
         document.head.appendChild(style);
-        
+
         // Auto-hide success message after 3 seconds
         if (type === 'success') {
           setTimeout(() => {

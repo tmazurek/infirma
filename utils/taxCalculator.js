@@ -7,25 +7,27 @@ const db = require('../config/database');
 const TAX_RATES = {
   // Ryczałt (lump sum) tax rate for IT industry
   PIT_RATE: 0.12, // 12%
-  
+
   // VAT rate
   VAT_RATE: 0.23, // 23%
-  
-  // ZUS (Social Security) monthly contributions for 2023/2024
-  // Full ZUS contributions
+
+  // ZUS (Social Security) monthly contributions for 2024
+  // Full ZUS contributions based on https://www.zus.pl/baza-wiedzy/skladki-wskazniki-odsetki/skladki/wysokosc-skladek-na-ubezpieczenia-spoleczne
   ZUS: {
     // Social insurance (ubezpieczenie społeczne)
     SOCIAL_INSURANCE: {
-      RETIREMENT: 812.23, // Emerytalne
-      DISABILITY: 333.60, // Rentowe
-      SICKNESS: 102.48, // Chorobowe
-      ACCIDENT: 58.57, // Wypadkowe (average rate)
-      LABOR_FUND: 98.91, // Fundusz Pracy
+      RETIREMENT: 916.35, // Emerytalne (19.52% of 4694.94 PLN)
+      DISABILITY: 375.60, // Rentowe (8% of 4694.94 PLN)
+      SICKNESS: 114.99, // Chorobowe (2.45% of 4694.94 PLN)
+      ACCIDENT: 78.20, // Wypadkowe (1.67% of 4694.94 PLN)
+      LABOR_FUND: 115.02, // Fundusz Pracy (2.45% of 4694.94 PLN)
+      FEP: 4.69, // Fundusz Emerytur Pomostowych (0.1% of 4694.94 PLN)
     },
-    
-    // Health insurance (ubezpieczenie zdrowotne)
-    HEALTH_INSURANCE: 559.89,
-    
+
+    // Health insurance (ubezpieczenie zdrowotne) for business activity taxed at lump sum (ryczałt)
+    // For income tax at 12%, health insurance is 9% of 75% of average monthly salary
+    HEALTH_INSURANCE: 419.46, // 9% of 4694.94 PLN * 0.75 = 9% of 3521.21 PLN
+
     // Total ZUS monthly payment
     get TOTAL() {
       return this.SOCIAL_INSURANCE.RETIREMENT +
@@ -33,6 +35,7 @@ const TAX_RATES = {
              this.SOCIAL_INSURANCE.SICKNESS +
              this.SOCIAL_INSURANCE.ACCIDENT +
              this.SOCIAL_INSURANCE.LABOR_FUND +
+             this.SOCIAL_INSURANCE.FEP +
              this.HEALTH_INSURANCE;
     }
   }
@@ -49,35 +52,35 @@ function calculateVAT(month, year, callback) {
   const startDate = `${year}-${String(month).padStart(2, '0')}-01`;
   const lastDay = new Date(year, month, 0).getDate(); // Get last day of the month
   const endDate = `${year}-${String(month).padStart(2, '0')}-${lastDay}`;
-  
+
   // Get VAT collected from invoices
   const invoicesSql = `
     SELECT SUM(total_vat) as vat_collected
     FROM Invoices
     WHERE issue_date BETWEEN ? AND ?
   `;
-  
+
   // Get VAT paid from expenses
   const expensesSql = `
     SELECT SUM(vat_amount_paid) as vat_paid
     FROM Expenses
     WHERE expense_date BETWEEN ? AND ?
   `;
-  
+
   db.get(invoicesSql, [startDate, endDate], (err, invoicesResult) => {
     if (err) {
       return callback(err, null);
     }
-    
+
     db.get(expensesSql, [startDate, endDate], (err, expensesResult) => {
       if (err) {
         return callback(err, null);
       }
-      
+
       const vatCollected = invoicesResult.vat_collected || 0;
       const vatPaid = expensesResult.vat_paid || 0;
       const vatDue = vatCollected - vatPaid;
-      
+
       callback(null, {
         vat_collected: vatCollected,
         vat_paid: vatPaid,
@@ -98,41 +101,41 @@ function calculatePIT(month, year, callback) {
   const startDate = `${year}-${String(month).padStart(2, '0')}-01`;
   const lastDay = new Date(year, month, 0).getDate(); // Get last day of the month
   const endDate = `${year}-${String(month).padStart(2, '0')}-${lastDay}`;
-  
+
   // Get income from invoices
   const invoicesSql = `
     SELECT SUM(total_net) as income
     FROM Invoices
     WHERE issue_date BETWEEN ? AND ?
   `;
-  
+
   // Get deductible expenses
   const expensesSql = `
     SELECT SUM(amount_net) as expenses
     FROM Expenses
     WHERE expense_date BETWEEN ? AND ?
   `;
-  
+
   db.get(invoicesSql, [startDate, endDate], (err, invoicesResult) => {
     if (err) {
       return callback(err, null);
     }
-    
+
     db.get(expensesSql, [startDate, endDate], (err, expensesResult) => {
       if (err) {
         return callback(err, null);
       }
-      
+
       const income = invoicesResult.income || 0;
-      
+
       // For "ryczałt" (lump sum tax), expenses are not deductible
       // We still calculate them for informational purposes
       const expenses = expensesResult.expenses || 0;
-      
+
       // For "ryczałt", tax is calculated on total income
       const taxableIncome = income;
       const incomeTax = taxableIncome * TAX_RATES.PIT_RATE;
-      
+
       callback(null, {
         income: income,
         expenses: expenses,
@@ -163,7 +166,7 @@ function calculateZUS(month, year, callback) {
     health_insurance: TAX_RATES.ZUS.HEALTH_INSURANCE,
     total: TAX_RATES.ZUS.TOTAL
   };
-  
+
   callback(null, zusContributions);
 }
 
@@ -179,19 +182,19 @@ function calculateFinancialSummary(month, year, callback) {
     if (err) {
       return callback(err, null);
     }
-    
+
     // Calculate PIT
     calculatePIT(month, year, (err, pitResult) => {
       if (err) {
         return callback(err, null);
       }
-      
+
       // Calculate ZUS
       calculateZUS(month, year, (err, zusResult) => {
         if (err) {
           return callback(err, null);
         }
-        
+
         // Combine all results
         const summary = {
           month: month,
@@ -202,7 +205,7 @@ function calculateFinancialSummary(month, year, callback) {
           // Calculate total tax burden
           total_tax_burden: vatResult.vat_due + pitResult.income_tax + zusResult.total
         };
-        
+
         callback(null, summary);
       });
     });
