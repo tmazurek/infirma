@@ -123,9 +123,19 @@
             </div>
 
             <div class="form-group">
-              <label for="zus_health_insurance_amount">Health Insurance Amount (PLN)</label>
+              <label for="zus_health_insurance_income_threshold">Health Insurance Income Threshold</label>
+              <select id="zus_health_insurance_income_threshold" name="zus_health_insurance_income_threshold">
+                <option value="low">Up to 60,000 PLN annual income (461.66 PLN monthly)</option>
+                <option value="medium">Between 60,000 and 300,000 PLN annual income (773.23 PLN monthly)</option>
+                <option value="high">Above 300,000 PLN annual income (1,384.97 PLN monthly)</option>
+              </select>
+              <small>Select your annual income threshold for health insurance calculation</small>
+            </div>
+
+            <div class="form-group">
+              <label for="zus_health_insurance_amount">Custom Health Insurance Amount (PLN)</label>
               <input type="number" id="zus_health_insurance_amount" name="zus_health_insurance_amount" min="0" step="0.01" value="0">
-              <small>Enter a fixed amount, or leave as 0 to use the default calculation</small>
+              <small>Enter a fixed amount, or leave as 0 to use the amount based on income threshold</small>
             </div>
 
             <div class="zus-summary">
@@ -260,6 +270,9 @@
         document.getElementById(fieldId).addEventListener('input', calculateZusContributions);
       });
 
+      // Add change event listener to health insurance income threshold select
+      document.getElementById('zus_health_insurance_income_threshold').addEventListener('change', calculateZusContributions);
+
       // Function to fetch company profile
       function fetchCompanyProfile() {
         fetch('/api/company-profile')
@@ -294,6 +307,16 @@
               document.getElementById('zus_fep_rate').value = data.zus_fep_rate || 0.1;
               document.getElementById('zus_health_insurance_amount').value = data.zus_health_insurance_amount || 0;
 
+              // Set health insurance income threshold
+              const thresholdSelect = document.getElementById('zus_health_insurance_income_threshold');
+              const threshold = data.zus_health_insurance_income_threshold || 'low';
+              for (let i = 0; i < thresholdSelect.options.length; i++) {
+                if (thresholdSelect.options[i].value === threshold) {
+                  thresholdSelect.selectedIndex = i;
+                  break;
+                }
+              }
+
               // Calculate ZUS contributions
               calculateZusContributions();
             }
@@ -320,7 +343,8 @@
           zus_sickness_rate: document.getElementById('zus_sickness_rate').value,
           zus_labor_fund_rate: document.getElementById('zus_labor_fund_rate').value,
           zus_fep_rate: document.getElementById('zus_fep_rate').value,
-          zus_health_insurance_amount: document.getElementById('zus_health_insurance_amount').value
+          zus_health_insurance_amount: document.getElementById('zus_health_insurance_amount').value,
+          zus_health_insurance_income_threshold: document.getElementById('zus_health_insurance_income_threshold').value
         };
 
         fetch('/api/company-profile', {
@@ -365,10 +389,28 @@
         const laborFund = (baseAmount * laborFundRate / 100).toFixed(2);
         const fep = (baseAmount * fepRate / 100).toFixed(2);
 
-        // Use custom health insurance amount if provided, otherwise calculate as 9% of 75% of base amount
-        const healthInsurance = healthInsuranceAmount > 0
-          ? healthInsuranceAmount.toFixed(2)
-          : (baseAmount * 0.75 * 0.09).toFixed(2);
+        // Get health insurance income threshold
+        const healthInsuranceThreshold = document.getElementById('zus_health_insurance_income_threshold').value || 'low';
+
+        // Determine health insurance amount based on threshold or custom amount
+        let healthInsurance;
+
+        if (healthInsuranceAmount > 0) {
+          // Use custom amount if provided
+          healthInsurance = healthInsuranceAmount.toFixed(2);
+        } else {
+          // Use amount based on income threshold
+          switch (healthInsuranceThreshold) {
+            case 'medium':
+              healthInsurance = '773.23';
+              break;
+            case 'high':
+              healthInsurance = '1384.97';
+              break;
+            default:
+              healthInsurance = '461.66';
+          }
+        }
 
         // Calculate total
         const socialInsuranceTotal = parseFloat(retirement) + parseFloat(disability) +

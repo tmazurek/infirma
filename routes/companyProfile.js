@@ -37,7 +37,8 @@ router.post('/', (req, res) => {
     zus_sickness_rate: req.body.zus_sickness_rate,
     zus_labor_fund_rate: req.body.zus_labor_fund_rate,
     zus_fep_rate: req.body.zus_fep_rate,
-    zus_health_insurance_amount: req.body.zus_health_insurance_amount
+    zus_health_insurance_amount: req.body.zus_health_insurance_amount,
+    zus_health_insurance_income_threshold: req.body.zus_health_insurance_income_threshold
   };
 
   CompanyProfile.saveProfile(profileData, (err, savedProfile) => {

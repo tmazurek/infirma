@@ -46,6 +46,7 @@ class CompanyProfile {
             zus_labor_fund_rate = ?,
             zus_fep_rate = ?,
             zus_health_insurance_amount = ?,
+            zus_health_insurance_income_threshold = ?,
             updated_at = CURRENT_TIMESTAMP
           WHERE id = ?
         `;
@@ -66,6 +67,7 @@ class CompanyProfile {
           profileData.zus_labor_fund_rate || 2.45,
           profileData.zus_fep_rate || 0.1,
           profileData.zus_health_insurance_amount || 0.0,
+          profileData.zus_health_insurance_income_threshold || 'low',
           existingProfile.id
         ];
 
@@ -93,7 +95,8 @@ class CompanyProfile {
             zus_sickness_rate,
             zus_labor_fund_rate,
             zus_fep_rate,
-            zus_health_insurance_amount
+            zus_health_insurance_amount,
+            zus_health_insurance_income_threshold
           ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         `;
 
@@ -112,7 +115,8 @@ class CompanyProfile {
           profileData.zus_sickness_rate || 2.45,
           profileData.zus_labor_fund_rate || 2.45,
           profileData.zus_fep_rate || 0.1,
-          profileData.zus_health_insurance_amount || 0.0
+          profileData.zus_health_insurance_amount || 0.0,
+          profileData.zus_health_insurance_income_threshold || 'low'
         ];
 
         db.run(sql, params, function(err) {

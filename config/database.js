@@ -38,6 +38,7 @@ function initializeDatabase() {
       zus_labor_fund_rate REAL DEFAULT 2.45,
       zus_fep_rate REAL DEFAULT 0.1,
       zus_health_insurance_amount REAL DEFAULT 0.0,
+      zus_health_insurance_income_threshold TEXT DEFAULT 'low',
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
       updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );

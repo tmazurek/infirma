@@ -24,19 +24,28 @@ const TAX_RATES = {
       FEP: 4.69, // Fundusz Emerytur Pomostowych (0.1% of 4694.94 PLN)
     },
 
-    // Health insurance (ubezpieczenie zdrowotne) for business activity taxed at lump sum (ryczałt)
-    // For income tax at 12%, health insurance is 9% of 75% of average monthly salary
-    HEALTH_INSURANCE: 419.46, // 9% of 4694.94 PLN * 0.75 = 9% of 3521.21 PLN
+    // Health insurance (ubezpieczenie zdrowotna) for business activity taxed at lump sum (ryczałt)
+    // Fixed amounts based on annual income thresholds for 2025
+    HEALTH_INSURANCE: {
+      LOW: 461.66, // Up to 60,000 PLN annual income
+      MEDIUM: 773.23, // Between 60,000 and 300,000 PLN annual income
+      HIGH: 1384.97 // Above 300,000 PLN annual income
+    },
 
-    // Total ZUS monthly payment
-    get TOTAL() {
+    // Default health insurance amount (low threshold)
+    DEFAULT_HEALTH_INSURANCE: function() {
+      return this.HEALTH_INSURANCE.LOW;
+    },
+
+    // Total ZUS monthly payment (using low threshold for health insurance)
+    TOTAL: function() {
       return this.SOCIAL_INSURANCE.RETIREMENT +
              this.SOCIAL_INSURANCE.DISABILITY +
              this.SOCIAL_INSURANCE.SICKNESS +
              this.SOCIAL_INSURANCE.ACCIDENT +
              this.SOCIAL_INSURANCE.LABOR_FUND +
              this.SOCIAL_INSURANCE.FEP +
-             this.HEALTH_INSURANCE;
+             this.HEALTH_INSURANCE.LOW;
     }
   }
 };
@@ -182,10 +191,27 @@ function calculateZUS(month, year, callback) {
       const laborFund = (baseAmount * laborFundRate / 100).toFixed(2) * 1;
       const fep = (baseAmount * fepRate / 100).toFixed(2) * 1;
 
-      // Use custom health insurance amount if provided, otherwise use default
-      const healthInsurance = profile.zus_health_insurance_amount > 0
-        ? profile.zus_health_insurance_amount
-        : TAX_RATES.ZUS.HEALTH_INSURANCE;
+      // Determine health insurance amount based on income threshold or custom amount
+      let healthInsurance;
+
+      if (profile.zus_health_insurance_amount > 0) {
+        // Use custom amount if provided
+        healthInsurance = profile.zus_health_insurance_amount;
+      } else {
+        // Use amount based on income threshold
+        const threshold = profile.zus_health_insurance_income_threshold || 'low';
+
+        switch (threshold.toLowerCase()) {
+          case 'medium':
+            healthInsurance = TAX_RATES.ZUS.HEALTH_INSURANCE.MEDIUM;
+            break;
+          case 'high':
+            healthInsurance = TAX_RATES.ZUS.HEALTH_INSURANCE.HIGH;
+            break;
+          default:
+            healthInsurance = TAX_RATES.ZUS.HEALTH_INSURANCE.LOW;
+        }
+      }
 
       // Calculate total
       const total = retirement + disability + accident + sickness + laborFund + fep + healthInsurance;
@@ -214,9 +240,9 @@ function calculateZUS(month, year, callback) {
           labor_fund: TAX_RATES.ZUS.SOCIAL_INSURANCE.LABOR_FUND,
           fep: TAX_RATES.ZUS.SOCIAL_INSURANCE.FEP
         },
-        health_insurance: TAX_RATES.ZUS.HEALTH_INSURANCE,
-        total: TAX_RATES.ZUS.TOTAL,
-        base_amount: 4694.94
+        health_insurance: TAX_RATES.ZUS.HEALTH_INSURANCE.LOW,
+        total: TAX_RATES.ZUS.TOTAL(),
+        base_amount: 5203.80
       };
     }
 
