@@ -54,6 +54,7 @@
           <li><a href="/company-profile">Company Profile</a></li>
           <li><a href="/clients">Clients</a></li>
           <li><a href="/invoices">Invoices</a></li>
+          <li><a href="/expenses">Expenses</a></li>
         </ul>
       </nav>
     </div>
@@ -63,9 +64,9 @@
     <section class="mt-3">
       <h2>Create New Invoice</h2>
       <p>Fill in the details to create a new invoice.</p>
-      
+
       <div id="message-container" class="mb-3" style="display: none;"></div>
-      
+
       <form id="invoice-form" class="mb-3">
         <div class="form-group">
           <label for="client_id">Client *</label>
@@ -74,29 +75,29 @@
             <!-- Client options will be added here dynamically -->
           </select>
         </div>
-        
+
         <div class="form-group">
           <label for="issue_date">Issue Date *</label>
           <input type="date" id="issue_date" name="issue_date" required>
         </div>
-        
+
         <div class="form-group">
           <label for="due_date">Due Date</label>
           <input type="date" id="due_date" name="due_date">
         </div>
-        
+
         <div class="form-group">
           <label for="payment_terms">Payment Terms</label>
           <input type="text" id="payment_terms" name="payment_terms" placeholder="e.g., 14 days">
         </div>
-        
+
         <h3>Invoice Items</h3>
         <div id="invoice-items" class="invoice-items">
           <!-- Item rows will be added here dynamically -->
         </div>
-        
+
         <button type="button" id="add-item-btn" class="btn">Add Item</button>
-        
+
         <div class="totals">
           <div class="totals-row">
             <span>Total Net:</span>
@@ -111,7 +112,7 @@
             <span id="total-gross">0.00 PLN</span>
           </div>
         </div>
-        
+
         <div class="form-group">
           <label for="status">Status</label>
           <select id="status" name="status">
@@ -119,7 +120,7 @@
             <option value="Issued">Issued</option>
           </select>
         </div>
-        
+
         <button type="submit" class="btn">Create Invoice</button>
         <a href="/invoices" class="btn" style="background-color: #6c757d;">Cancel</a>
       </form>
@@ -143,28 +144,28 @@
       const totalVatElement = document.getElementById('total-vat');
       const totalGrossElement = document.getElementById('total-gross');
       const messageContainer = document.getElementById('message-container');
-      
+
       // Set default issue date to today
       const today = new Date().toISOString().split('T')[0];
       document.getElementById('issue_date').value = today;
-      
+
       // Load clients on page load
       loadClients();
-      
+
       // Add first item row
       addItemRow();
-      
+
       // Add item button click
       addItemBtn.addEventListener('click', function() {
         addItemRow();
       });
-      
+
       // Invoice form submission
       invoiceForm.addEventListener('submit', function(e) {
         e.preventDefault();
         createInvoice();
       });
-      
+
       // Function to load all clients
       function loadClients() {
         fetch('/api/clients')
@@ -181,11 +182,11 @@
             showMessage('error', 'Error loading clients: ' + error.message);
           });
       }
-      
+
       // Function to populate client select dropdown
       function populateClientSelect(clients) {
         clientSelect.innerHTML = '<option value="">Select a client</option>';
-        
+
         clients.forEach(client => {
           const option = document.createElement('option');
           option.value = client.id;
@@ -193,15 +194,15 @@
           clientSelect.appendChild(option);
         });
       }
-      
+
       // Function to add an item row
       function addItemRow() {
         const itemRow = document.createElement('div');
         itemRow.className = 'item-row';
-        
+
         // Generate a unique ID for the item row
         const itemId = Date.now();
-        
+
         itemRow.innerHTML = `
           <div class="form-group">
             <label for="description_${itemId}">Description *</label>
@@ -221,9 +222,9 @@
           </div>
           <button type="button" class="btn btn-remove-item">Remove</button>
         `;
-        
+
         invoiceItemsContainer.appendChild(itemRow);
-        
+
         // Add event listener to remove button
         itemRow.querySelector('.btn-remove-item').addEventListener('click', function() {
           if (document.querySelectorAll('.item-row').length > 1) {
@@ -233,42 +234,42 @@
             showMessage('error', 'At least one item is required');
           }
         });
-        
+
         // Add event listeners to calculate totals when values change
         const inputs = itemRow.querySelectorAll('input[type="number"]');
         inputs.forEach(input => {
           input.addEventListener('input', calculateTotals);
         });
       }
-      
+
       // Function to calculate totals
       function calculateTotals() {
         let totalNet = 0;
         let totalVat = 0;
         let totalGross = 0;
-        
+
         const itemRows = document.querySelectorAll('.item-row');
-        
+
         itemRows.forEach(row => {
           const quantity = parseFloat(row.querySelector('input[name="quantity"]').value) || 0;
           const unitPriceNet = parseFloat(row.querySelector('input[name="unit_price_net"]').value) || 0;
           const vatRate = parseFloat(row.querySelector('input[name="vat_rate"]').value) || 0;
-          
+
           const itemTotalNet = quantity * unitPriceNet;
           const itemTotalVat = itemTotalNet * (vatRate / 100);
           const itemTotalGross = itemTotalNet + itemTotalVat;
-          
+
           totalNet += itemTotalNet;
           totalVat += itemTotalVat;
           totalGross += itemTotalGross;
         });
-        
+
         // Update totals display
         totalNetElement.textContent = totalNet.toFixed(2) + ' PLN';
         totalVatElement.textContent = totalVat.toFixed(2) + ' PLN';
         totalGrossElement.textContent = totalGross.toFixed(2) + ' PLN';
       }
-      
+
       // Function to create an invoice
       function createInvoice() {
         // Collect form data
@@ -277,17 +278,17 @@
         const dueDate = document.getElementById('due_date').value;
         const paymentTerms = document.getElementById('payment_terms').value;
         const status = document.getElementById('status').value;
-        
+
         // Collect items data
         const items = [];
         const itemRows = document.querySelectorAll('.item-row');
-        
+
         itemRows.forEach(row => {
           const description = row.querySelector('input[name="description"]').value;
           const quantity = parseFloat(row.querySelector('input[name="quantity"]').value);
           const unitPriceNet = parseFloat(row.querySelector('input[name="unit_price_net"]').value);
           const vatRate = parseFloat(row.querySelector('input[name="vat_rate"]').value);
-          
+
           items.push({
             description,
             quantity,
@@ -295,7 +296,7 @@
             vat_rate: vatRate
           });
         });
-        
+
         // Create invoice data object
         const invoiceData = {
           client_id: clientId,
@@ -305,7 +306,7 @@
           status: status,
           items: items
         };
-        
+
         // Send request to create invoice
         fetch('/api/invoices', {
           method: 'POST',
@@ -324,7 +325,7 @@
         })
         .then(data => {
           showMessage('success', data.message);
-          
+
           // Redirect to invoices list after a short delay
           setTimeout(() => {
             window.location.href = '/invoices';
@@ -334,12 +335,12 @@
           showMessage('error', error.message);
         });
       }
-      
+
       // Function to show messages
       function showMessage(type, message) {
         messageContainer.innerHTML = `<div class="${type === 'error' ? 'error' : 'success'}">${message}</div>`;
         messageContainer.style.display = 'block';
-        
+
         // Add some basic styling for messages
         const style = document.createElement('style');
         style.textContent = `
@@ -359,7 +360,7 @@
           }
         `;
         document.head.appendChild(style);
-        
+
         // Auto-hide message after 5 seconds
         setTimeout(() => {
           messageContainer.style.display = 'none';

@@ -80,6 +80,21 @@ function initializeDatabase() {
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
       FOREIGN KEY (invoice_id) REFERENCES Invoices(id) ON DELETE CASCADE
     );
+
+    -- Expenses table
+    CREATE TABLE IF NOT EXISTS Expenses (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      expense_date DATE NOT NULL,
+      vendor_name TEXT,
+      description TEXT NOT NULL,
+      amount_net REAL,
+      vat_amount_paid REAL,
+      amount_gross REAL NOT NULL,
+      category TEXT,
+      invoice_scan_url_optional TEXT,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
   `;
 
   db.exec(createTablesSQL, (err) => {

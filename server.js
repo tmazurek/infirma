@@ -7,6 +7,7 @@ const PORT = process.env.PORT || 3000;
 const companyProfileRoutes = require('./routes/companyProfile');
 const clientsRoutes = require('./routes/clients');
 const invoicesRoutes = require('./routes/invoices');
+const expensesRoutes = require('./routes/expenses');
 
 // Middleware
 app.use(express.json());
@@ -17,6 +18,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/api/company-profile', companyProfileRoutes);
 app.use('/api/clients', clientsRoutes);
 app.use('/api/invoices', invoicesRoutes);
+app.use('/api/expenses', expensesRoutes);
 
 // Frontend Routes
 app.get('/', (req, res) => {
@@ -46,6 +48,11 @@ app.get('/create-invoice', (req, res) => {
 // View invoice page
 app.get('/view-invoice/:id', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'view-invoice.html'));
+});
+
+// Expenses page
+app.get('/expenses', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'expenses.html'));
 });
 
 // Start server
