@@ -82,6 +82,7 @@
           <li><a href="/clients">Clients</a></li>
           <li><a href="/invoices">Invoices</a></li>
           <li><a href="/expenses">Expenses</a></li>
+          <li><a href="/summary">Summary</a></li>
         </ul>
       </nav>
     </div>
@@ -91,9 +92,9 @@
     <section class="mt-3">
       <h2>Expenses</h2>
       <p>Track and manage your business expenses.</p>
-      
+
       <div id="message-container" class="mb-3" style="display: none;"></div>
-      
+
       <div class="filters">
         <h3>Filters</h3>
         <form id="filter-form">
@@ -118,9 +119,9 @@
           <button type="button" id="clear-filters-btn" class="btn" style="background-color: #6c757d;">Clear Filters</button>
         </form>
       </div>
-      
+
       <button id="add-expense-btn" class="btn mb-3">Add New Expense</button>
-      
+
       <div class="expense-list">
         <table id="expenses-table">
           <thead>
@@ -148,25 +149,25 @@
     <div class="modal-content">
       <span class="close">&times;</span>
       <h3 id="modal-title">Add New Expense</h3>
-      
+
       <form id="expense-form">
         <input type="hidden" id="expense-id">
-        
+
         <div class="form-group">
           <label for="expense_date">Date *</label>
           <input type="date" id="expense_date" name="expense_date" required>
         </div>
-        
+
         <div class="form-group">
           <label for="vendor_name">Vendor</label>
           <input type="text" id="vendor_name" name="vendor_name">
         </div>
-        
+
         <div class="form-group">
           <label for="description">Description *</label>
           <input type="text" id="description" name="description" required>
         </div>
-        
+
         <div class="form-group">
           <label for="category_input">Category</label>
           <input type="text" id="category_input" name="category" list="categories-list">
@@ -174,22 +175,22 @@
             <!-- Categories will be added here dynamically -->
           </datalist>
         </div>
-        
+
         <div class="form-group">
           <label for="amount_net">Net Amount</label>
           <input type="number" id="amount_net" name="amount_net" min="0" step="0.01">
         </div>
-        
+
         <div class="form-group">
           <label for="vat_amount_paid">VAT Amount</label>
           <input type="number" id="vat_amount_paid" name="vat_amount_paid" min="0" step="0.01">
         </div>
-        
+
         <div class="form-group">
           <label for="amount_gross">Gross Amount *</label>
           <input type="number" id="amount_gross" name="amount_gross" min="0.01" step="0.01" required>
         </div>
-        
+
         <button type="submit" class="btn">Save Expense</button>
       </form>
     </div>
@@ -231,7 +232,7 @@
       const cancelDeleteBtn = document.getElementById('cancel-delete');
       const categorySelect = document.getElementById('category');
       const categoriesList = document.getElementById('categories-list');
-      
+
       // Close buttons for modals
       const closeButtons = document.querySelectorAll('.close');
       closeButtons.forEach(btn => {
@@ -240,68 +241,68 @@
           deleteModal.style.display = 'none';
         });
       });
-      
+
       // Cancel delete button
       cancelDeleteBtn.addEventListener('click', function() {
         deleteModal.style.display = 'none';
       });
-      
+
       // Set default expense date to today
       const today = new Date().toISOString().split('T')[0];
       document.getElementById('expense_date').value = today;
-      
+
       // Load expenses and categories on page load
       loadExpenses();
       loadCategories();
-      
+
       // Add expense button click
       addExpenseBtn.addEventListener('click', function() {
         resetExpenseForm();
         modalTitle.textContent = 'Add New Expense';
         expenseModal.style.display = 'block';
       });
-      
+
       // Expense form submission
       expenseForm.addEventListener('submit', function(e) {
         e.preventDefault();
         saveExpense();
       });
-      
+
       // Filter form submission
       filterForm.addEventListener('submit', function(e) {
         e.preventDefault();
         loadExpenses();
       });
-      
+
       // Clear filters button click
       clearFiltersBtn.addEventListener('click', function() {
         filterForm.reset();
         loadExpenses();
       });
-      
+
       // Function to load all expenses
       function loadExpenses() {
         // Get filter values
         const startDate = document.getElementById('start-date').value;
         const endDate = document.getElementById('end-date').value;
         const category = document.getElementById('category').value;
-        
+
         // Build query string
         let queryString = '';
         if (startDate) queryString += `startDate=${startDate}&`;
         if (endDate) queryString += `endDate=${endDate}&`;
         if (category) queryString += `category=${encodeURIComponent(category)}&`;
-        
+
         // Remove trailing & if present
         if (queryString.endsWith('&')) {
           queryString = queryString.slice(0, -1);
         }
-        
+
         // Add ? if query string is not empty
         if (queryString) {
           queryString = '?' + queryString;
         }
-        
+
         fetch(`/api/expenses${queryString}`)
           .then(response => {
             if (!response.ok) {
@@ -316,7 +317,7 @@
             showMessage('error', 'Error loading expenses: ' + error.message);
           });
       }
-      
+
       // Function to load categories
       function loadCategories() {
         fetch('/api/expenses/categories')
@@ -329,17 +330,17 @@
           .then(categories => {
             // Populate category select in filter form
             categorySelect.innerHTML = '<option value="">All Categories</option>';
-            
+
             // Populate datalist for category input in expense form
             categoriesList.innerHTML = '';
-            
+
             categories.forEach(category => {
               // Add to filter select
               const option = document.createElement('option');
               option.value = category;
               option.textContent = category;
               categorySelect.appendChild(option);
-              
+
               // Add to datalist
               const dataOption = document.createElement('option');
               dataOption.value = category;
@@ -350,24 +351,24 @@
             console.error('Error loading categories:', error);
           });
       }
-      
+
       // Function to display expenses in the table
       function displayExpenses(expenses) {
         expensesTableBody.innerHTML = '';
-        
+
         if (expenses.length === 0) {
           const row = document.createElement('tr');
           row.innerHTML = '<td colspan="8" class="text-center">No expenses found. Add your first expense!</td>';
           expensesTableBody.appendChild(row);
           return;
         }
-        
+
         expenses.forEach(expense => {
           const row = document.createElement('tr');
-          
+
           // Format date
           const expenseDate = new Date(expense.expense_date).toLocaleDateString();
-          
+
           row.innerHTML = `
             <td>${expenseDate}</td>
             <td>${expense.vendor_name || '-'}</td>
@@ -383,7 +384,7 @@
           `;
           expensesTableBody.appendChild(row);
         });
-        
+
         // Add event listeners to edit and delete buttons
         document.querySelectorAll('.btn-edit').forEach(btn => {
           btn.addEventListener('click', function() {
@@ -391,7 +392,7 @@
             editExpense(expenseId);
           });
         });
-        
+
         document.querySelectorAll('.btn-delete').forEach(btn => {
           btn.addEventListener('click', function() {
             const expenseId = this.getAttribute('data-id');
@@ -399,7 +400,7 @@
           });
         });
       }
-      
+
       // Function to edit an expense
       function editExpense(expenseId) {
         fetch(`/api/expenses/${expenseId}`)
@@ -419,7 +420,7 @@
             document.getElementById('amount_net').value = expense.amount_net || '';
             document.getElementById('vat_amount_paid').value = expense.vat_amount_paid || '';
             document.getElementById('amount_gross').value = expense.amount_gross;
-            
+
             // Update modal title and show modal
             modalTitle.textContent = 'Edit Expense';
             expenseModal.style.display = 'block';
@@ -428,19 +429,19 @@
             showMessage('error', 'Error loading expense details: ' + error.message);
           });
       }
-      
+
       // Function to show delete confirmation
       function showDeleteConfirmation(expenseId) {
         confirmDeleteBtn.setAttribute('data-id', expenseId);
         deleteModal.style.display = 'block';
-        
+
         // Set up the confirm delete button
         confirmDeleteBtn.onclick = function() {
           const id = this.getAttribute('data-id');
           deleteExpense(id);
         };
       }
-      
+
       // Function to delete an expense
       function deleteExpense(expenseId) {
         fetch(`/api/expenses/${expenseId}`, {
@@ -464,12 +465,12 @@
           showMessage('error', error.message);
         });
       }
-      
+
       // Function to save an expense (create or update)
       function saveExpense() {
         const expenseId = expenseIdInput.value;
         const isUpdate = expenseId !== '';
-        
+
         const expenseData = {
           expense_date: document.getElementById('expense_date').value,
           vendor_name: document.getElementById('vendor_name').value,
@@ -479,10 +480,10 @@
           vat_amount_paid: document.getElementById('vat_amount_paid').value || null,
           amount_gross: document.getElementById('amount_gross').value
         };
-        
+
         const url = isUpdate ? `/api/expenses/${expenseId}` : '/api/expenses';
         const method = isUpdate ? 'PUT' : 'POST';
-        
+
         fetch(url, {
           method: method,
           headers: {
@@ -508,19 +509,19 @@
           showMessage('error', error.message);
         });
       }
-      
+
       // Function to reset the expense form
       function resetExpenseForm() {
         expenseForm.reset();
         expenseIdInput.value = '';
         document.getElementById('expense_date').value = today;
       }
-      
+
       // Function to show messages
       function showMessage(type, message) {
         messageContainer.innerHTML = `<div class="${type === 'error' ? 'error' : 'success'}">${message}</div>`;
         messageContainer.style.display = 'block';
-        
+
         // Add some basic styling for messages
         const style = document.createElement('style');
         style.textContent = `
@@ -540,13 +541,13 @@
           }
         `;
         document.head.appendChild(style);
-        
+
         // Auto-hide message after 5 seconds
         setTimeout(() => {
           messageContainer.style.display = 'none';
         }, 5000);
       }
-      
+
       // Close modal when clicking outside of it
       window.addEventListener('click', function(event) {
         if (event.target === expenseModal) {

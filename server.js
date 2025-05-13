@@ -8,6 +8,7 @@ const companyProfileRoutes = require('./routes/companyProfile');
 const clientsRoutes = require('./routes/clients');
 const invoicesRoutes = require('./routes/invoices');
 const expensesRoutes = require('./routes/expenses');
+const financialSummaryRoutes = require('./routes/financialSummary');
 
 // Middleware
 app.use(express.json());
@@ -19,6 +20,7 @@ app.use('/api/company-profile', companyProfileRoutes);
 app.use('/api/clients', clientsRoutes);
 app.use('/api/invoices', invoicesRoutes);
 app.use('/api/expenses', expensesRoutes);
+app.use('/api/financial-summary', financialSummaryRoutes);
 
 // Frontend Routes
 app.get('/', (req, res) => {
@@ -53,6 +55,11 @@ app.get('/view-invoice/:id', (req, res) => {
 // Expenses page
 app.get('/expenses', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'expenses.html'));
+});
+
+// Financial summary page
+app.get('/summary', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'summary.html'));
 });
 
 // Start server

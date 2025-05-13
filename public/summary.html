@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Financial Summary - Infirma</title>
+  <link rel="stylesheet" href="/styles.css">
+  <style>
+    .date-selector {
+      background-color: #f8f9fa;
+      padding: 15px;
+      border-radius: 5px;
+      margin-bottom: 20px;
+      display: flex;
+      gap: 15px;
+      align-items: flex-end;
+    }
+    .summary-container {
+      display: none;
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 5px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+    .summary-section {
+      margin-bottom: 30px;
+    }
+    .summary-section h3 {
+      border-bottom: 1px solid #ddd;
+      padding-bottom: 5px;
+      margin-bottom: 15px;
+    }
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+    .summary-label {
+      font-weight: bold;
+    }
+    .summary-value {
+      text-align: right;
+    }
+    .total-row {
+      font-weight: bold;
+      font-size: 1.1em;
+      border-top: 1px solid #ddd;
+      padding-top: 10px;
+      margin-top: 10px;
+    }
+    .disclaimer {
+      background-color: #f8d7da;
+      color: #721c24;
+      padding: 15px;
+      border-radius: 5px;
+      margin-top: 30px;
+      font-size: 0.9em;
+    }
+    .disclaimer h3 {
+      margin-top: 0;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container">
+      <h1>Infirma</h1>
+      <nav>
+        <ul>
+          <li><a href="/">Home</a></li>
+          <li><a href="/company-profile">Company Profile</a></li>
+          <li><a href="/clients">Clients</a></li>
+          <li><a href="/invoices">Invoices</a></li>
+          <li><a href="/expenses">Expenses</a></li>
+          <li><a href="/summary">Summary</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="mt-3">
+      <h2>Monthly Financial Summary</h2>
+      <p>View estimated tax obligations based on your recorded financial data.</p>
+      
+      <div id="message-container" class="mb-3" style="display: none;"></div>
+      
+      <div class="date-selector">
+        <div class="form-group">
+          <label for="month">Month</label>
+          <select id="month" name="month">
+            <option value="1">January</option>
+            <option value="2">February</option>
+            <option value="3">March</option>
+            <option value="4">April</option>
+            <option value="5">May</option>
+            <option value="6">June</option>
+            <option value="7">July</option>
+            <option value="8">August</option>
+            <option value="9">September</option>
+            <option value="10">October</option>
+            <option value="11">November</option>
+            <option value="12">December</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label for="year">Year</label>
+          <select id="year" name="year">
+            <!-- Years will be added dynamically -->
+          </select>
+        </div>
+        
+        <button id="generate-btn" class="btn">Generate Summary</button>
+      </div>
+      
+      <div id="summary-container" class="summary-container">
+        <div class="summary-section">
+          <h3>Income & Expenses</h3>
+          <div class="summary-row">
+            <div class="summary-label">Total Income (Net):</div>
+            <div id="income" class="summary-value">0.00 PLN</div>
+          </div>
+          <div class="summary-row">
+            <div class="summary-label">Total Expenses (Net):</div>
+            <div id="expenses" class="summary-value">0.00 PLN</div>
+          </div>
+        </div>
+        
+        <div class="summary-section">
+          <h3>VAT</h3>
+          <div class="summary-row">
+            <div class="summary-label">VAT Collected:</div>
+            <div id="vat-collected" class="summary-value">0.00 PLN</div>
+          </div>
+          <div class="summary-row">
+            <div class="summary-label">VAT Paid:</div>
+            <div id="vat-paid" class="summary-value">0.00 PLN</div>
+          </div>
+          <div class="summary-row total-row">
+            <div class="summary-label">VAT Due:</div>
+            <div id="vat-due" class="summary-value">0.00 PLN</div>
+          </div>
+        </div>
+        
+        <div class="summary-section">
+          <h3>Income Tax (Ryczałt 12%)</h3>
+          <div class="summary-row">
+            <div class="summary-label">Taxable Income:</div>
+            <div id="taxable-income" class="summary-value">0.00 PLN</div>
+          </div>
+          <div class="summary-row">
+            <div class="summary-label">Tax Rate:</div>
+            <div id="tax-rate" class="summary-value">12%</div>
+          </div>
+          <div class="summary-row total-row">
+            <div class="summary-label">Income Tax Due:</div>
+            <div id="income-tax" class="summary-value">0.00 PLN</div>
+          </div>
+        </div>
+        
+        <div class="summary-section">
+          <h3>ZUS (Social Security)</h3>
+          <div class="summary-row">
+            <div class="summary-label">Retirement Insurance:</div>
+            <div id="zus-retirement" class="summary-value">0.00 PLN</div>
+          </div>
+          <div class="summary-row">
+            <div class="summary-label">Disability Insurance:</div>
+            <div id="zus-disability" class="summary-value">0.00 PLN</div>
+          </div>
+          <div class="summary-row">
+            <div class="summary-label">Sickness Insurance:</div>
+            <div id="zus-sickness" class="summary-value">0.00 PLN</div>
+          </div>
+          <div class="summary-row">
+            <div class="summary-label">Accident Insurance:</div>
+            <div id="zus-accident" class="summary-value">0.00 PLN</div>
+          </div>
+          <div class="summary-row">
+            <div class="summary-label">Labor Fund:</div>
+            <div id="zus-labor-fund" class="summary-value">0.00 PLN</div>
+          </div>
+          <div class="summary-row">
+            <div class="summary-label">Health Insurance:</div>
+            <div id="zus-health" class="summary-value">0.00 PLN</div>
+          </div>
+          <div class="summary-row total-row">
+            <div class="summary-label">Total ZUS Due:</div>
+            <div id="zus-total" class="summary-value">0.00 PLN</div>
+          </div>
+        </div>
+        
+        <div class="summary-section">
+          <h3>Total Tax Burden</h3>
+          <div class="summary-row total-row">
+            <div class="summary-label">Total Monthly Tax Burden:</div>
+            <div id="total-tax-burden" class="summary-value">0.00 PLN</div>
+          </div>
+        </div>
+        
+        <div class="disclaimer">
+          <h3>IMPORTANT DISCLAIMER</h3>
+          <p>These figures are estimates based on entered data and pre-set rules. They are provided for informational purposes only and should not be considered as financial or tax advice.</p>
+          <p>The user is solely responsible for verifying accuracy with official sources or an accountant before making any payments or submissions to tax authorities.</p>
+          <p>Tax laws and rates change frequently. Always consult with a qualified tax professional for your specific situation.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="text-center mt-3">
+    <div class="container">
+      <p>&copy; 2025 Infirma - Accounting App</p>
+    </div>
+  </footer>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // DOM Elements
+      const monthSelect = document.getElementById('month');
+      const yearSelect = document.getElementById('year');
+      const generateBtn = document.getElementById('generate-btn');
+      const summaryContainer = document.getElementById('summary-container');
+      const messageContainer = document.getElementById('message-container');
+      
+      // Populate year select with current year and previous 5 years
+      const currentYear = new Date().getFullYear();
+      for (let year = currentYear; year >= currentYear - 5; year--) {
+        const option = document.createElement('option');
+        option.value = year;
+        option.textContent = year;
+        yearSelect.appendChild(option);
+      }
+      
+      // Set default month to current month
+      const currentMonth = new Date().getMonth() + 1; // JavaScript months are 0-indexed
+      monthSelect.value = currentMonth;
+      
+      // Generate button click
+      generateBtn.addEventListener('click', function() {
+        const month = monthSelect.value;
+        const year = yearSelect.value;
+        
+        generateSummary(month, year);
+      });
+      
+      // Function to generate financial summary
+      function generateSummary(month, year) {
+        // Show loading message
+        showMessage('success', 'Generating summary...');
+        
+        fetch(`/api/financial-summary?month=${month}&year=${year}`)
+          .then(response => {
+            if (!response.ok) {
+              return response.json().then(err => {
+                throw new Error(err.error || 'Failed to generate summary');
+              });
+            }
+            return response.json();
+          })
+          .then(data => {
+            displaySummary(data);
+            messageContainer.style.display = 'none';
+          })
+          .catch(error => {
+            showMessage('error', error.message);
+          });
+      }
+      
+      // Function to display financial summary
+      function displaySummary(data) {
+        // Format currency
+        const formatCurrency = (value) => {
+          return parseFloat(value).toFixed(2) + ' PLN';
+        };
+        
+        // Income & Expenses
+        document.getElementById('income').textContent = formatCurrency(data.pit.income);
+        document.getElementById('expenses').textContent = formatCurrency(data.pit.expenses);
+        
+        // VAT
+        document.getElementById('vat-collected').textContent = formatCurrency(data.vat.vat_collected);
+        document.getElementById('vat-paid').textContent = formatCurrency(data.vat.vat_paid);
+        document.getElementById('vat-due').textContent = formatCurrency(data.vat.vat_due);
+        
+        // Income Tax
+        document.getElementById('taxable-income').textContent = formatCurrency(data.pit.taxable_income);
+        document.getElementById('tax-rate').textContent = (data.pit.income_tax_rate * 100) + '%';
+        document.getElementById('income-tax').textContent = formatCurrency(data.pit.income_tax);
+        
+        // ZUS
+        document.getElementById('zus-retirement').textContent = formatCurrency(data.zus.social_insurance.retirement);
+        document.getElementById('zus-disability').textContent = formatCurrency(data.zus.social_insurance.disability);
+        document.getElementById('zus-sickness').textContent = formatCurrency(data.zus.social_insurance.sickness);
+        document.getElementById('zus-accident').textContent = formatCurrency(data.zus.social_insurance.accident);
+        document.getElementById('zus-labor-fund').textContent = formatCurrency(data.zus.social_insurance.labor_fund);
+        document.getElementById('zus-health').textContent = formatCurrency(data.zus.health_insurance);
+        document.getElementById('zus-total').textContent = formatCurrency(data.zus.total);
+        
+        // Total Tax Burden
+        document.getElementById('total-tax-burden').textContent = formatCurrency(data.total_tax_burden);
+        
+        // Show summary container
+        summaryContainer.style.display = 'block';
+      }
+      
+      // Function to show messages
+      function showMessage(type, message) {
+        messageContainer.innerHTML = `<div class="${type === 'error' ? 'error' : 'success'}">${message}</div>`;
+        messageContainer.style.display = 'block';
+        
+        // Add some basic styling for messages
+        const style = document.createElement('style');
+        style.textContent = `
+          .success {
+            background-color: #d4edda;
+            color: #155724;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+          }
+          .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+          }
+        `;
+        document.head.appendChild(style);
+        
+        // Auto-hide success message after 3 seconds
+        if (type === 'success') {
+          setTimeout(() => {
+            messageContainer.style.display = 'none';
+          }, 3000);
+        }
+      }
+    });
+  </script>
+</body>
+</html>
