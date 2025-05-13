@@ -17,12 +17,24 @@ const db = new sqlite3.Database(dbPath, (err) => {
 function initializeDatabase() {
   // Enable foreign keys
   db.run('PRAGMA foreign_keys = ON');
-  
+
   // Create tables if they don't exist
   const createTablesSQL = `
-    -- This will be populated with table creation SQL in future tasks
+    -- Company Profile table
+    CREATE TABLE IF NOT EXISTS CompanyProfile (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      company_name TEXT NOT NULL,
+      nip TEXT UNIQUE NOT NULL,
+      street_address TEXT,
+      city TEXT,
+      postal_code TEXT,
+      bank_account_number TEXT,
+      default_vat_rate REAL DEFAULT 23.0,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
   `;
-  
+
   db.exec(createTablesSQL, (err) => {
     if (err) {
       console.error('Error initializing database tables:', err.message);
