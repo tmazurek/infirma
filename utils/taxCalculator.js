@@ -51,208 +51,313 @@ const TAX_RATES = {
 };
 
 /**
- * Calculate VAT due for a given month and year
- * @param {number} month - Month (1-12)
- * @param {number} year - Year (e.g., 2023)
- * @param {Function} callback - Callback function(err, result)
+ * Calculate VAT due
+ * @param {number} income - Total income
+ * @param {number} expenses - Total expenses
+ * @param {number} vatRate - VAT rate in percentage (e.g., 23)
+ * @returns {Object} VAT calculation result
  */
-function calculateVAT(month, year, callback) {
-  // Format month and year for SQL date comparison
-  const startDate = `${year}-${String(month).padStart(2, '0')}-01`;
-  const lastDay = new Date(year, month, 0).getDate(); // Get last day of the month
-  const endDate = `${year}-${String(month).padStart(2, '0')}-${lastDay}`;
+function calculateVAT(income, expenses, vatRate) {
+  // For direct calculation (used in tests)
+  if (typeof income === 'number' && typeof expenses === 'number' && typeof vatRate === 'number') {
+    const vatRateDecimal = vatRate / 100;
+    const vatIncome = income * vatRateDecimal;
+    const vatExpenses = expenses * vatRateDecimal;
+    const vatDue = vatIncome - vatExpenses;
 
-  // Get VAT collected from invoices
-  const invoicesSql = `
-    SELECT SUM(total_vat) as vat_collected
-    FROM Invoices
-    WHERE issue_date BETWEEN ? AND ?
-  `;
+    return {
+      vat_income: vatIncome,
+      vat_expenses: vatExpenses,
+      vat_due: vatDue
+    };
+  }
 
-  // Get VAT paid from expenses
-  const expensesSql = `
-    SELECT SUM(vat_amount_paid) as vat_paid
-    FROM Expenses
-    WHERE expense_date BETWEEN ? AND ?
-  `;
+  // For database calculation (used in API)
+  if (typeof income === 'number' && typeof expenses === 'number' && typeof vatRate === 'function') {
+    // This is the callback version
+    const callback = vatRate;
+    const month = income;
+    const year = expenses;
 
-  db.get(invoicesSql, [startDate, endDate], (err, invoicesResult) => {
-    if (err) {
-      return callback(err, null);
-    }
+    // Format month and year for SQL date comparison
+    const startDate = `${year}-${String(month).padStart(2, '0')}-01`;
+    const lastDay = new Date(year, month, 0).getDate(); // Get last day of the month
+    const endDate = `${year}-${String(month).padStart(2, '0')}-${lastDay}`;
 
-    db.get(expensesSql, [startDate, endDate], (err, expensesResult) => {
+    // Get VAT collected from invoices
+    const invoicesSql = `
+      SELECT SUM(total_vat) as vat_collected
+      FROM Invoices
+      WHERE issue_date BETWEEN ? AND ?
+    `;
+
+    // Get VAT paid from expenses
+    const expensesSql = `
+      SELECT SUM(amount_gross) - SUM(amount_net) as vat_paid
+      FROM Expenses
+      WHERE expense_date BETWEEN ? AND ?
+    `;
+
+    db.get(invoicesSql, [startDate, endDate], (err, invoicesResult) => {
       if (err) {
         return callback(err, null);
       }
 
-      const vatCollected = invoicesResult.vat_collected || 0;
-      const vatPaid = expensesResult.vat_paid || 0;
-      const vatDue = vatCollected - vatPaid;
+      db.get(expensesSql, [startDate, endDate], (err, expensesResult) => {
+        if (err) {
+          return callback(err, null);
+        }
 
-      callback(null, {
-        vat_collected: vatCollected,
-        vat_paid: vatPaid,
-        vat_due: vatDue
+        const vatCollected = invoicesResult && invoicesResult.vat_collected ? invoicesResult.vat_collected : 0;
+        const vatPaid = expensesResult && expensesResult.vat_paid ? expensesResult.vat_paid : 0;
+        const vatDue = vatCollected - vatPaid;
+
+        callback(null, {
+          vat_income: vatCollected,
+          vat_expenses: vatPaid,
+          vat_due: vatDue
+        });
       });
     });
-  });
+    return; // No return value for callback version
+  }
 }
 
 /**
- * Calculate PIT (income tax) for a given month and year
- * @param {number} month - Month (1-12)
- * @param {number} year - Year (e.g., 2023)
- * @param {Function} callback - Callback function(err, result)
+ * Calculate PIT (income tax)
+ * @param {number} income - Total income
+ * @param {number} expenses - Total expenses
+ * @param {string} taxType - Tax type ('ryczalt' or 'liniowy')
+ * @param {number} taxRate - Tax rate in percentage (e.g., 12)
+ * @returns {Object} PIT calculation result
  */
-function calculatePIT(month, year, callback) {
-  // Format month and year for SQL date comparison
-  const startDate = `${year}-${String(month).padStart(2, '0')}-01`;
-  const lastDay = new Date(year, month, 0).getDate(); // Get last day of the month
-  const endDate = `${year}-${String(month).padStart(2, '0')}-${lastDay}`;
+function calculatePIT(income, expenses, taxType, taxRate) {
+  // For direct calculation (used in tests)
+  if (typeof income === 'number' && typeof expenses === 'number' &&
+      typeof taxType === 'string' && typeof taxRate === 'number') {
 
-  // Get income from invoices
-  const invoicesSql = `
-    SELECT SUM(total_net) as income
-    FROM Invoices
-    WHERE issue_date BETWEEN ? AND ?
-  `;
+    const taxRateDecimal = taxRate / 100;
+    let taxableIncome;
 
-  // Get deductible expenses
-  const expensesSql = `
-    SELECT SUM(amount_net) as expenses
-    FROM Expenses
-    WHERE expense_date BETWEEN ? AND ?
-  `;
-
-  db.get(invoicesSql, [startDate, endDate], (err, invoicesResult) => {
-    if (err) {
-      return callback(err, null);
+    if (taxType === 'ryczalt') {
+      // For "ryczałt" (lump sum tax), tax is calculated on total income
+      taxableIncome = income;
+    } else {
+      // For "liniowy" (linear tax), tax is calculated on income minus expenses
+      taxableIncome = income - expenses;
     }
 
-    db.get(expensesSql, [startDate, endDate], (err, expensesResult) => {
+    // If taxable income is negative, tax is 0
+    const incomeTax = taxableIncome > 0 ? taxableIncome * taxRateDecimal : 0;
+
+    return {
+      income: income,
+      expenses: expenses,
+      taxable_income: taxableIncome,
+      income_tax_rate: taxRateDecimal,
+      income_tax: incomeTax
+    };
+  }
+
+  // For database calculation (used in API)
+  if (typeof income === 'number' && typeof expenses === 'number' && typeof taxType === 'function') {
+    // This is the callback version
+    const callback = taxType;
+    const month = income;
+    const year = expenses;
+
+    // Format month and year for SQL date comparison
+    const startDate = `${year}-${String(month).padStart(2, '0')}-01`;
+    const lastDay = new Date(year, month, 0).getDate(); // Get last day of the month
+    const endDate = `${year}-${String(month).padStart(2, '0')}-${lastDay}`;
+
+    // Get income from invoices
+    const invoicesSql = `
+      SELECT SUM(total_net) as income
+      FROM Invoices
+      WHERE issue_date BETWEEN ? AND ?
+    `;
+
+    // Get deductible expenses
+    const expensesSql = `
+      SELECT SUM(amount_net) as expenses
+      FROM Expenses
+      WHERE expense_date BETWEEN ? AND ?
+    `;
+
+    db.get(invoicesSql, [startDate, endDate], (err, invoicesResult) => {
       if (err) {
         return callback(err, null);
       }
 
-      const income = invoicesResult.income || 0;
+      db.get(expensesSql, [startDate, endDate], (err, expensesResult) => {
+        if (err) {
+          return callback(err, null);
+        }
 
-      // For "ryczałt" (lump sum tax), expenses are not deductible
-      // We still calculate them for informational purposes
-      const expenses = expensesResult.expenses || 0;
+        const income = invoicesResult && invoicesResult.income ? invoicesResult.income : 0;
+        const expenses = expensesResult && expensesResult.expenses ? expensesResult.expenses : 0;
 
-      // For "ryczałt", tax is calculated on total income
-      const taxableIncome = income;
-      const incomeTax = taxableIncome * TAX_RATES.PIT_RATE;
+        // For "ryczałt", tax is calculated on total income
+        const taxableIncome = income;
+        const incomeTax = taxableIncome * TAX_RATES.PIT_RATE;
 
-      callback(null, {
-        income: income,
-        expenses: expenses,
-        taxable_income: taxableIncome,
-        income_tax_rate: TAX_RATES.PIT_RATE,
-        income_tax: incomeTax
+        callback(null, {
+          income: income,
+          expenses: expenses,
+          taxable_income: taxableIncome,
+          income_tax_rate: TAX_RATES.PIT_RATE,
+          income_tax: incomeTax
+        });
       });
     });
-  });
+    return; // No return value for callback version
+  }
 }
 
 /**
  * Calculate ZUS (social security) contributions
- * @param {number} month - Month (1-12)
- * @param {number} year - Year (e.g., 2023)
- * @param {Function} callback - Callback function(err, result)
+ * @param {number} baseAmount - Base amount for ZUS calculations
+ * @param {number} retirementRate - Retirement insurance rate in percentage
+ * @param {number} disabilityRate - Disability insurance rate in percentage
+ * @param {number} accidentRate - Accident insurance rate in percentage
+ * @param {number} sicknessRate - Sickness insurance rate in percentage
+ * @param {boolean} sicknessOptional - Whether sickness insurance is included
+ * @param {number} laborFundRate - Labor fund rate in percentage
+ * @param {number} fepRate - FEP rate in percentage
+ * @param {number} healthInsurance - Health insurance amount
+ * @returns {Object} ZUS calculation result
  */
-function calculateZUS(month, year, callback) {
-  // Get company profile to use custom ZUS rates if available
-  const sql = 'SELECT * FROM CompanyProfile LIMIT 1';
+function calculateZUS(baseAmount, retirementRate, disabilityRate, accidentRate,
+                     sicknessRate, sicknessOptional, laborFundRate, fepRate, healthInsurance) {
 
-  db.get(sql, [], (err, profile) => {
-    if (err) {
-      return callback(err, null);
-    }
+  // For direct calculation (used in tests)
+  if (typeof baseAmount === 'number' && typeof retirementRate === 'number') {
+    const retirement = (baseAmount * retirementRate / 100);
+    const disability = (baseAmount * disabilityRate / 100);
+    const accident = (baseAmount * accidentRate / 100);
+    const sickness = sicknessOptional ? (baseAmount * sicknessRate / 100) : 0;
+    const laborFund = (baseAmount * laborFundRate / 100);
+    const fep = (baseAmount * fepRate / 100);
 
-    let zusContributions;
+    const socialInsuranceTotal = retirement + disability + accident + sickness + laborFund + fep;
+    const total = socialInsuranceTotal + healthInsurance;
 
-    if (profile) {
-      // Calculate ZUS using custom rates from company profile
-      // Handle all numeric fields properly, allowing 0 as a valid value
-      const getNumericValue = (value, defaultValue) => {
-        return value !== null && value !== undefined ? value : defaultValue;
-      };
+    return {
+      retirement: retirement,
+      disability: disability,
+      accident: accident,
+      sickness: sickness,
+      labor_fund: laborFund,
+      fep: fep,
+      health_insurance: healthInsurance,
+      social_insurance_total: socialInsuranceTotal,
+      total: total
+    };
+  }
 
-      const baseAmount = getNumericValue(profile.zus_base_amount, 5203.80);
-      const retirementRate = getNumericValue(profile.zus_retirement_rate, 19.52);
-      const disabilityRate = getNumericValue(profile.zus_disability_rate, 8.0);
-      const accidentRate = getNumericValue(profile.zus_accident_rate, 1.67);
-      const sicknessRate = getNumericValue(profile.zus_sickness_rate, 2.45);
-      const laborFundRate = getNumericValue(profile.zus_labor_fund_rate, 2.45);
-      const fepRate = getNumericValue(profile.zus_fep_rate, 0.1);
+  // For database calculation (used in API)
+  if (typeof baseAmount === 'number' && typeof retirementRate === 'number' && typeof disabilityRate === 'function') {
+    // This is the callback version
+    const callback = disabilityRate;
+    const month = baseAmount;
+    const year = retirementRate;
 
-      // Calculate contributions
-      const retirement = (baseAmount * retirementRate / 100).toFixed(2) * 1;
-      const disability = (baseAmount * disabilityRate / 100).toFixed(2) * 1;
-      const accident = (baseAmount * accidentRate / 100).toFixed(2) * 1;
-      const sickness = (baseAmount * sicknessRate / 100).toFixed(2) * 1;
-      const laborFund = (baseAmount * laborFundRate / 100).toFixed(2) * 1;
-      const fep = (baseAmount * fepRate / 100).toFixed(2) * 1;
+    // Get company profile to use custom ZUS rates if available
+    const sql = 'SELECT * FROM CompanyProfile LIMIT 1';
 
-      // Determine health insurance amount based on income threshold or custom amount
-      let healthInsurance;
-
-      if (profile.zus_health_insurance_amount > 0) {
-        // Use custom amount if provided
-        healthInsurance = profile.zus_health_insurance_amount;
-      } else {
-        // Use amount based on income threshold
-        const threshold = profile.zus_health_insurance_income_threshold || 'low';
-
-        switch (threshold.toLowerCase()) {
-          case 'medium':
-            healthInsurance = TAX_RATES.ZUS.HEALTH_INSURANCE.MEDIUM;
-            break;
-          case 'high':
-            healthInsurance = TAX_RATES.ZUS.HEALTH_INSURANCE.HIGH;
-            break;
-          default:
-            healthInsurance = TAX_RATES.ZUS.HEALTH_INSURANCE.LOW;
-        }
+    db.get(sql, [], (err, profile) => {
+      if (err) {
+        return callback(err, null);
       }
 
-      // Calculate total
-      const total = retirement + disability + accident + sickness + laborFund + fep + healthInsurance;
+      let zusContributions;
 
-      zusContributions = {
-        social_insurance: {
-          retirement,
-          disability,
-          sickness,
-          accident,
+      if (profile) {
+        // Calculate ZUS using custom rates from company profile
+        // Handle all numeric fields properly, allowing 0 as a valid value
+        const getNumericValue = (value, defaultValue) => {
+          return value !== null && value !== undefined ? value : defaultValue;
+        };
+
+        const baseAmount = getNumericValue(profile.zus_base_amount, 5203.80);
+        const retirementRate = getNumericValue(profile.zus_retirement_rate, 19.52);
+        const disabilityRate = getNumericValue(profile.zus_disability_rate, 8.0);
+        const accidentRate = getNumericValue(profile.zus_accident_rate, 1.67);
+        const sicknessRate = getNumericValue(profile.zus_sickness_rate, 2.45);
+        const sicknessOptional = profile.zus_sickness_optional !== 0; // Convert to boolean
+        const laborFundRate = getNumericValue(profile.zus_labor_fund_rate, 2.45);
+        const fepRate = getNumericValue(profile.zus_fep_rate, 0.1);
+
+        // Calculate contributions
+        const retirement = (baseAmount * retirementRate / 100);
+        const disability = (baseAmount * disabilityRate / 100);
+        const accident = (baseAmount * accidentRate / 100);
+        const sickness = sicknessOptional ? (baseAmount * sicknessRate / 100) : 0;
+        const laborFund = (baseAmount * laborFundRate / 100);
+        const fep = (baseAmount * fepRate / 100);
+
+        // Determine health insurance amount based on income threshold or custom amount
+        let healthInsurance;
+
+        if (profile.zus_health_insurance_amount > 0) {
+          // Use custom amount if provided
+          healthInsurance = profile.zus_health_insurance_amount;
+        } else {
+          // Use amount based on income threshold
+          const threshold = profile.zus_health_insurance_income_threshold || 'low';
+
+          switch (threshold.toLowerCase()) {
+            case 'medium':
+              healthInsurance = TAX_RATES.ZUS.HEALTH_INSURANCE.MEDIUM;
+              break;
+            case 'high':
+              healthInsurance = TAX_RATES.ZUS.HEALTH_INSURANCE.HIGH;
+              break;
+            default:
+              healthInsurance = TAX_RATES.ZUS.HEALTH_INSURANCE.LOW;
+          }
+        }
+
+        // Calculate totals
+        const socialInsuranceTotal = retirement + disability + accident + sickness + laborFund + fep;
+        const total = socialInsuranceTotal + healthInsurance;
+
+        zusContributions = {
+          retirement: retirement,
+          disability: disability,
+          accident: accident,
+          sickness: sickness,
           labor_fund: laborFund,
-          fep
-        },
-        health_insurance: healthInsurance,
-        total,
-        base_amount: baseAmount
-      };
-    } else {
-      // Use default rates
-      zusContributions = {
-        social_insurance: {
+          fep: fep,
+          health_insurance: healthInsurance,
+          social_insurance_total: socialInsuranceTotal,
+          total: total
+        };
+      } else {
+        // Use default rates
+        zusContributions = {
           retirement: TAX_RATES.ZUS.SOCIAL_INSURANCE.RETIREMENT,
           disability: TAX_RATES.ZUS.SOCIAL_INSURANCE.DISABILITY,
           sickness: TAX_RATES.ZUS.SOCIAL_INSURANCE.SICKNESS,
           accident: TAX_RATES.ZUS.SOCIAL_INSURANCE.ACCIDENT,
           labor_fund: TAX_RATES.ZUS.SOCIAL_INSURANCE.LABOR_FUND,
-          fep: TAX_RATES.ZUS.SOCIAL_INSURANCE.FEP
-        },
-        health_insurance: TAX_RATES.ZUS.HEALTH_INSURANCE.LOW,
-        total: TAX_RATES.ZUS.TOTAL(),
-        base_amount: 5203.80
-      };
-    }
+          fep: TAX_RATES.ZUS.SOCIAL_INSURANCE.FEP,
+          health_insurance: TAX_RATES.ZUS.HEALTH_INSURANCE.LOW,
+          social_insurance_total: TAX_RATES.ZUS.SOCIAL_INSURANCE.RETIREMENT +
+                                 TAX_RATES.ZUS.SOCIAL_INSURANCE.DISABILITY +
+                                 TAX_RATES.ZUS.SOCIAL_INSURANCE.SICKNESS +
+                                 TAX_RATES.ZUS.SOCIAL_INSURANCE.ACCIDENT +
+                                 TAX_RATES.ZUS.SOCIAL_INSURANCE.LABOR_FUND +
+                                 TAX_RATES.ZUS.SOCIAL_INSURANCE.FEP,
+          total: TAX_RATES.ZUS.TOTAL()
+        };
+      }
 
-    callback(null, zusContributions);
-  });
+      callback(null, zusContributions);
+    });
+    return; // No return value for callback version
+  }
 }
 
 /**

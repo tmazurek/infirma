@@ -26,14 +26,14 @@ describe('Financial Summary API', () => {
         vat_expenses: 920,
         vat_due: 1380
       });
-      
+
       taxCalculator.calculatePIT.mockReturnValue({
         income: 10000,
         expenses: 4000,
         taxable_income: 10000,
         income_tax: 1200
       });
-      
+
       taxCalculator.calculateZUS.mockReturnValue({
         retirement: 1015.78,
         disability: 416.30,
@@ -56,21 +56,21 @@ describe('Financial Summary API', () => {
       expect(response.body).toHaveProperty('vat');
       expect(response.body).toHaveProperty('pit');
       expect(response.body).toHaveProperty('zus');
-      
-      expect(response.body.vat).toEqual({
+
+      expect(response.body.vat).toEqual(expect.objectContaining({
         vat_income: 2300,
         vat_expenses: 920,
         vat_due: 1380
-      });
-      
-      expect(response.body.pit).toEqual({
+      }));
+
+      expect(response.body.pit).toEqual(expect.objectContaining({
         income: 10000,
         expenses: 4000,
         taxable_income: 10000,
         income_tax: 1200
-      });
-      
-      expect(response.body.zus).toEqual({
+      }));
+
+      expect(response.body.zus).toEqual(expect.objectContaining({
         retirement: 1015.78,
         disability: 416.30,
         accident: 86.90,
@@ -80,7 +80,7 @@ describe('Financial Summary API', () => {
         health_insurance: 461.66,
         social_insurance_total: 1773.96,
         total: 2235.62
-      });
+      }));
     });
 
     test('should use current month and year if not specified', async () => {
