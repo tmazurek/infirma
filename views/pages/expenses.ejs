@@ -1,0 +1,472 @@
+<div class="dashboard-greeting">
+  <div class="greeting-text">
+    <h1>Koszty</h1>
+  </div>
+  <div class="action-buttons">
+    <button id="add-expense-btn" class="action-button primary">
+      <i class="fas fa-plus"></i> Dodaj nowy koszt
+    </button>
+  </div>
+</div>
+
+<div id="message-container" class="mb-3" style="display: none;"></div>
+
+<div class="card">
+  <div class="card-header">
+    <h2>Filtry</h2>
+  </div>
+  <div class="card-body">
+    <form id="filter-form" class="d-flex gap-10">
+      <div class="form-group">
+        <label for="date-from">Od daty</label>
+        <input type="date" id="date-from" name="date_from">
+      </div>
+      <div class="form-group">
+        <label for="date-to">Do daty</label>
+        <input type="date" id="date-to" name="date_to">
+      </div>
+      <div class="form-group">
+        <label for="category">Kategoria</label>
+        <select id="category" name="category">
+          <option value="">Wszystkie</option>
+          <option value="office">Biuro</option>
+          <option value="transport">Transport</option>
+          <option value="services">Usługi</option>
+          <option value="equipment">Sprzęt</option>
+          <option value="software">Oprogramowanie</option>
+          <option value="other">Inne</option>
+        </select>
+      </div>
+      <div class="form-group" style="align-self: flex-end;">
+        <button type="submit" class="btn">Filtruj</button>
+        <button type="button" id="reset-filters" class="btn btn-outline">Reset</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="card mt-3">
+  <div class="card-header">
+    <h2>Lista kosztów</h2>
+    <div class="d-flex align-center">
+      <span id="total-expenses">Suma: 0.00 PLN</span>
+    </div>
+  </div>
+  <div class="card-body">
+    <table id="expenses-table">
+      <thead>
+        <tr>
+          <th>Data</th>
+          <th>Sprzedawca</th>
+          <th>Opis</th>
+          <th>Kategoria</th>
+          <th>Kwota netto</th>
+          <th>VAT</th>
+          <th>Kwota brutto</th>
+          <th>Akcje</th>
+        </tr>
+      </thead>
+      <tbody id="expenses-table-body">
+        <!-- Expense rows will be added here dynamically -->
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Expense Modal -->
+<div id="expense-modal" class="modal">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <h3 id="modal-title">Dodaj nowy koszt</h3>
+    
+    <form id="expense-form">
+      <input type="hidden" id="expense-id">
+      
+      <div class="form-group">
+        <label for="expense-date">Data</label>
+        <input type="date" id="expense-date" name="expense_date" required>
+      </div>
+      
+      <div class="form-group">
+        <label for="vendor-name">Sprzedawca</label>
+        <input type="text" id="vendor-name" name="vendor_name" required>
+      </div>
+      
+      <div class="form-group">
+        <label for="description">Opis</label>
+        <input type="text" id="description" name="description" required>
+      </div>
+      
+      <div class="form-group">
+        <label for="expense-category">Kategoria</label>
+        <select id="expense-category" name="category">
+          <option value="office">Biuro</option>
+          <option value="transport">Transport</option>
+          <option value="services">Usługi</option>
+          <option value="equipment">Sprzęt</option>
+          <option value="software">Oprogramowanie</option>
+          <option value="other">Inne</option>
+        </select>
+      </div>
+      
+      <div class="form-group">
+        <label for="amount-net">Kwota netto (PLN)</label>
+        <input type="number" id="amount-net" name="amount_net" step="0.01" min="0" required>
+      </div>
+      
+      <div class="form-group">
+        <label for="vat-rate">Stawka VAT (%)</label>
+        <select id="vat-rate" name="vat_rate">
+          <option value="23">23%</option>
+          <option value="8">8%</option>
+          <option value="5">5%</option>
+          <option value="0">0%</option>
+          <option value="-1">Zwolniony</option>
+        </select>
+      </div>
+      
+      <div class="form-group">
+        <label for="amount-gross">Kwota brutto (PLN)</label>
+        <input type="number" id="amount-gross" name="amount_gross" step="0.01" min="0" required>
+      </div>
+      
+      <button type="submit" class="btn">Zapisz</button>
+    </form>
+  </div>
+</div>
+
+<style>
+  .modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.4);
+  }
+  .modal-content {
+    background-color: #fff;
+    margin: 10% auto;
+    padding: 20px;
+    border-radius: 5px;
+    width: 80%;
+    max-width: 600px;
+  }
+  .close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+  }
+  .close:hover {
+    color: #000;
+  }
+  #filter-form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+  }
+  #filter-form .form-group {
+    flex: 1;
+    min-width: 200px;
+  }
+  @media (max-width: 768px) {
+    #filter-form .form-group {
+      flex: 0 0 100%;
+    }
+  }
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // DOM Elements
+    const addExpenseBtn = document.getElementById('add-expense-btn');
+    const expenseModal = document.getElementById('expense-modal');
+    const closeBtn = document.querySelector('.close');
+    const expenseForm = document.getElementById('expense-form');
+    const expenseIdInput = document.getElementById('expense-id');
+    const modalTitle = document.getElementById('modal-title');
+    const filterForm = document.getElementById('filter-form');
+    const resetFiltersBtn = document.getElementById('reset-filters');
+    const expensesTableBody = document.getElementById('expenses-table-body');
+    const totalExpensesSpan = document.getElementById('total-expenses');
+    const messageContainer = document.getElementById('message-container');
+    
+    // Event Listeners
+    addExpenseBtn.addEventListener('click', showAddExpenseModal);
+    closeBtn.addEventListener('click', closeModal);
+    expenseForm.addEventListener('submit', saveExpense);
+    filterForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      loadExpenses();
+    });
+    resetFiltersBtn.addEventListener('click', resetFilters);
+    
+    // VAT calculation
+    const amountNetInput = document.getElementById('amount-net');
+    const vatRateSelect = document.getElementById('vat-rate');
+    const amountGrossInput = document.getElementById('amount-gross');
+    
+    amountNetInput.addEventListener('input', calculateGross);
+    vatRateSelect.addEventListener('change', calculateGross);
+    amountGrossInput.addEventListener('input', calculateNet);
+    
+    // Load expenses on page load
+    loadExpenses();
+    
+    // Functions
+    function showAddExpenseModal() {
+      expenseForm.reset();
+      expenseIdInput.value = '';
+      modalTitle.textContent = 'Dodaj nowy koszt';
+      document.getElementById('expense-date').valueAsDate = new Date();
+      expenseModal.style.display = 'block';
+    }
+    
+    function closeModal() {
+      expenseModal.style.display = 'none';
+    }
+    
+    function calculateGross() {
+      const amountNet = parseFloat(amountNetInput.value) || 0;
+      const vatRate = parseFloat(vatRateSelect.value);
+      
+      if (vatRate >= 0) {
+        const vatAmount = amountNet * (vatRate / 100);
+        const amountGross = amountNet + vatAmount;
+        amountGrossInput.value = amountGross.toFixed(2);
+      } else {
+        // VAT exempt
+        amountGrossInput.value = amountNet.toFixed(2);
+      }
+    }
+    
+    function calculateNet() {
+      const amountGross = parseFloat(amountGrossInput.value) || 0;
+      const vatRate = parseFloat(vatRateSelect.value);
+      
+      if (vatRate > 0) {
+        const amountNet = amountGross / (1 + (vatRate / 100));
+        amountNetInput.value = amountNet.toFixed(2);
+      } else {
+        // VAT 0% or exempt
+        amountNetInput.value = amountGross.toFixed(2);
+      }
+    }
+    
+    function saveExpense(e) {
+      e.preventDefault();
+      
+      const expenseId = expenseIdInput.value;
+      const formData = new FormData(expenseForm);
+      const expenseData = {};
+      
+      formData.forEach((value, key) => {
+        expenseData[key] = value;
+      });
+      
+      const url = expenseId ? `/api/expenses/${expenseId}` : '/api/expenses';
+      const method = expenseId ? 'PUT' : 'POST';
+      
+      fetch(url, {
+        method: method,
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(expenseData)
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Failed to save expense');
+        }
+        return response.json();
+      })
+      .then(data => {
+        closeModal();
+        showMessage('success', 'Expense saved successfully!');
+        loadExpenses();
+      })
+      .catch(error => {
+        showMessage('error', 'Error: ' + error.message);
+      });
+    }
+    
+    function loadExpenses() {
+      const formData = new FormData(filterForm);
+      const filters = {};
+      
+      formData.forEach((value, key) => {
+        if (value) filters[key] = value;
+      });
+      
+      const queryParams = new URLSearchParams(filters).toString();
+      const url = `/api/expenses${queryParams ? '?' + queryParams : ''}`;
+      
+      fetch(url)
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Failed to fetch expenses');
+          }
+          return response.json();
+        })
+        .then(expenses => {
+          displayExpenses(expenses);
+        })
+        .catch(error => {
+          showMessage('error', 'Error loading expenses: ' + error.message);
+        });
+    }
+    
+    function displayExpenses(expenses) {
+      expensesTableBody.innerHTML = '';
+      
+      if (expenses.length === 0) {
+        const row = document.createElement('tr');
+        row.innerHTML = '<td colspan="8" class="text-center">No expenses found. Add your first expense!</td>';
+        expensesTableBody.appendChild(row);
+        totalExpensesSpan.textContent = 'Suma: 0.00 PLN';
+        return;
+      }
+      
+      let totalGross = 0;
+      
+      expenses.forEach(expense => {
+        const row = document.createElement('tr');
+        
+        // Format date
+        const expenseDate = new Date(expense.expense_date).toLocaleDateString();
+        
+        // Get category display name
+        const categoryMap = {
+          'office': 'Biuro',
+          'transport': 'Transport',
+          'services': 'Usługi',
+          'equipment': 'Sprzęt',
+          'software': 'Oprogramowanie',
+          'other': 'Inne'
+        };
+        
+        const categoryDisplay = categoryMap[expense.category] || expense.category;
+        
+        // Calculate VAT amount
+        const vatAmount = parseFloat(expense.amount_gross) - parseFloat(expense.amount_net);
+        
+        row.innerHTML = `
+          <td>${expenseDate}</td>
+          <td>${expense.vendor_name}</td>
+          <td>${expense.description}</td>
+          <td>${categoryDisplay}</td>
+          <td>${parseFloat(expense.amount_net).toFixed(2)} PLN</td>
+          <td>${vatAmount.toFixed(2)} PLN</td>
+          <td>${parseFloat(expense.amount_gross).toFixed(2)} PLN</td>
+          <td>
+            <button class="btn-sm edit-expense" data-id="${expense.id}">
+              <i class="fas fa-edit"></i>
+            </button>
+            <button class="btn-sm btn-warning delete-expense" data-id="${expense.id}">
+              <i class="fas fa-trash"></i>
+            </button>
+          </td>
+        `;
+        expensesTableBody.appendChild(row);
+        
+        totalGross += parseFloat(expense.amount_gross);
+      });
+      
+      totalExpensesSpan.textContent = `Suma: ${totalGross.toFixed(2)} PLN`;
+      
+      // Add event listeners to edit and delete buttons
+      document.querySelectorAll('.edit-expense').forEach(btn => {
+        btn.addEventListener('click', function() {
+          const expenseId = this.getAttribute('data-id');
+          editExpense(expenseId);
+        });
+      });
+      
+      document.querySelectorAll('.delete-expense').forEach(btn => {
+        btn.addEventListener('click', function() {
+          const expenseId = this.getAttribute('data-id');
+          deleteExpense(expenseId);
+        });
+      });
+    }
+    
+    function editExpense(expenseId) {
+      fetch(`/api/expenses/${expenseId}`)
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Failed to fetch expense details');
+        }
+        return response.json();
+      })
+      .then(expense => {
+        expenseIdInput.value = expense.id;
+        document.getElementById('expense-date').value = expense.expense_date.split('T')[0];
+        document.getElementById('vendor-name').value = expense.vendor_name || '';
+        document.getElementById('description').value = expense.description || '';
+        document.getElementById('expense-category').value = expense.category || 'other';
+        document.getElementById('amount-net').value = expense.amount_net || '0.00';
+        document.getElementById('vat-rate').value = expense.vat_rate || '23';
+        document.getElementById('amount-gross').value = expense.amount_gross || '0.00';
+        
+        modalTitle.textContent = 'Edytuj koszt';
+        expenseModal.style.display = 'block';
+      })
+      .catch(error => {
+        showMessage('error', 'Error: ' + error.message);
+      });
+    }
+    
+    function deleteExpense(expenseId) {
+      if (confirm('Czy na pewno chcesz usunąć ten koszt?')) {
+        fetch(`/api/expenses/${expenseId}`, {
+          method: 'DELETE'
+        })
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Failed to delete expense');
+          }
+          return response.json();
+        })
+        .then(data => {
+          showMessage('success', 'Expense deleted successfully!');
+          loadExpenses();
+        })
+        .catch(error => {
+          showMessage('error', 'Error: ' + error.message);
+        });
+      }
+    }
+    
+    function resetFilters() {
+      filterForm.reset();
+      loadExpenses();
+    }
+    
+    function showMessage(type, message) {
+      messageContainer.innerHTML = `
+        <div class="card mb-3">
+          <div class="card-body ${type === 'error' ? 'text-warning' : 'text-success'}">
+            <i class="fas ${type === 'error' ? 'fa-exclamation-circle' : 'fa-check-circle'}"></i> ${message}
+          </div>
+        </div>
+      `;
+      messageContainer.style.display = 'block';
+      
+      // Auto-hide message after 5 seconds
+      setTimeout(() => {
+        messageContainer.style.display = 'none';
+      }, 5000);
+    }
+    
+    // Close modal when clicking outside of it
+    window.addEventListener('click', function(event) {
+      if (event.target === expenseModal) {
+        closeModal();
+      }
+    });
+  });
+</script>

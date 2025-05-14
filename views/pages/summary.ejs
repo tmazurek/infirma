@@ -1,0 +1,232 @@
+<div class="dashboard-greeting">
+  <div class="greeting-text">
+    <h1>Podsumowanie finansowe</h1>
+  </div>
+  <div class="period-selector">
+    <label for="month">Miesiąc:</label>
+    <select id="month">
+      <option value="1">Styczeń</option>
+      <option value="2">Luty</option>
+      <option value="3">Marzec</option>
+      <option value="4">Kwiecień</option>
+      <option value="5">Maj</option>
+      <option value="6">Czerwiec</option>
+      <option value="7">Lipiec</option>
+      <option value="8">Sierpień</option>
+      <option value="9">Wrzesień</option>
+      <option value="10">Październik</option>
+      <option value="11">Listopad</option>
+      <option value="12">Grudzień</option>
+    </select>
+    <label for="year">Rok:</label>
+    <select id="year">
+      <option value="2023">2023</option>
+      <option value="2024">2024</option>
+      <option value="2025">2025</option>
+    </select>
+    <button id="load-summary" class="btn">Wczytaj</button>
+  </div>
+</div>
+
+<div class="dashboard-grid">
+  <div class="card">
+    <div class="card-header">
+      <h2>Przychody</h2>
+    </div>
+    <div class="card-body">
+      <div class="finance-item">
+        <div>
+          <div class="finance-item-title">Suma przychodów</div>
+          <div class="finance-item-details">Wszystkie faktury w okresie</div>
+        </div>
+        <div class="finance-item-amount" id="total-income">0,00 PLN</div>
+      </div>
+      <div class="finance-item">
+        <div>
+          <div class="finance-item-title">Liczba faktur</div>
+          <div class="finance-item-details">Wystawione faktury</div>
+        </div>
+        <div class="finance-item-amount" id="invoice-count">0</div>
+      </div>
+      <div class="finance-item">
+        <div>
+          <div class="finance-item-title">Średnia wartość faktury</div>
+        </div>
+        <div class="finance-item-amount" id="average-invoice">0,00 PLN</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <h2>Koszty</h2>
+    </div>
+    <div class="card-body">
+      <div class="finance-item">
+        <div>
+          <div class="finance-item-title">Suma kosztów</div>
+          <div class="finance-item-details">Wszystkie wydatki w okresie</div>
+        </div>
+        <div class="finance-item-amount" id="total-expenses">0,00 PLN</div>
+      </div>
+      <div class="finance-item">
+        <div>
+          <div class="finance-item-title">Liczba wydatków</div>
+        </div>
+        <div class="finance-item-amount" id="expense-count">0</div>
+      </div>
+      <div class="finance-item">
+        <div>
+          <div class="finance-item-title">Największy wydatek</div>
+        </div>
+        <div class="finance-item-amount" id="largest-expense">0,00 PLN</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <h2>Podatki</h2>
+      <button class="btn-sm btn-outline">Opłać z inFakt</button>
+    </div>
+    <div class="card-body">
+      <div class="finance-item">
+        <div>
+          <div class="finance-item-title">VAT do zapłaty</div>
+          <div class="finance-item-details">VAT należny - VAT naliczony</div>
+        </div>
+        <div class="finance-item-amount" id="vat-due">0,00 PLN</div>
+      </div>
+      <div class="finance-item">
+        <div>
+          <div class="finance-item-title">Ryczałt</div>
+          <div class="finance-item-details">12% od przychodu</div>
+        </div>
+        <div class="finance-item-amount" id="income-tax">0,00 PLN</div>
+      </div>
+      <div class="finance-item">
+        <div>
+          <div class="finance-item-title">ZUS</div>
+          <div class="finance-item-details">Składki społeczne i zdrowotne</div>
+        </div>
+        <div class="finance-item-amount" id="zus-payment">0,00 PLN</div>
+      </div>
+    </div>
+    <div class="card-footer">
+      <div class="d-flex justify-between align-center">
+        <span class="text-success">
+          <i class="fas fa-check-circle"></i> Wszystko opłacone!
+        </span>
+        <i class="fas fa-thumbs-up text-primary"></i>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <h2>Podsumowanie</h2>
+    </div>
+    <div class="card-body">
+      <div class="finance-item">
+        <div>
+          <div class="finance-item-title">Przychód</div>
+        </div>
+        <div class="finance-item-amount" id="summary-income">0,00 PLN</div>
+      </div>
+      <div class="finance-item">
+        <div>
+          <div class="finance-item-title">Koszty</div>
+        </div>
+        <div class="finance-item-amount" id="summary-expenses">0,00 PLN</div>
+      </div>
+      <div class="finance-item">
+        <div>
+          <div class="finance-item-title">Podatki i ZUS</div>
+        </div>
+        <div class="finance-item-amount" id="summary-taxes">0,00 PLN</div>
+      </div>
+      <div class="finance-item">
+        <div>
+          <div class="finance-item-title">Zysk netto</div>
+          <div class="finance-item-details">Po odliczeniu kosztów i podatków</div>
+        </div>
+        <div class="finance-item-amount" id="net-profit">0,00 PLN</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .period-selector {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .period-selector select {
+    padding: 8px;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+  }
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Set default month and year to current
+    const currentDate = new Date();
+    document.getElementById('month').value = currentDate.getMonth() + 1;
+    document.getElementById('year').value = currentDate.getFullYear();
+    
+    // Load summary on page load
+    loadSummary();
+    
+    // Load summary when button is clicked
+    document.getElementById('load-summary').addEventListener('click', loadSummary);
+    
+    function loadSummary() {
+      const month = document.getElementById('month').value;
+      const year = document.getElementById('year').value;
+      
+      fetch(`/api/financial-summary?month=${month}&year=${year}`)
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Failed to fetch financial summary');
+          }
+          return response.json();
+        })
+        .then(data => {
+          updateSummaryUI(data);
+        })
+        .catch(error => {
+          console.error('Error loading summary:', error);
+          alert('Error loading financial summary: ' + error.message);
+        });
+    }
+    
+    function updateSummaryUI(data) {
+      // Income section
+      document.getElementById('total-income').textContent = formatCurrency(data.income.total);
+      document.getElementById('invoice-count').textContent = data.income.count;
+      document.getElementById('average-invoice').textContent = formatCurrency(data.income.average);
+      
+      // Expenses section
+      document.getElementById('total-expenses').textContent = formatCurrency(data.expenses.total);
+      document.getElementById('expense-count').textContent = data.expenses.count;
+      document.getElementById('largest-expense').textContent = formatCurrency(data.expenses.largest);
+      
+      // Taxes section
+      document.getElementById('vat-due').textContent = formatCurrency(data.taxes.vat);
+      document.getElementById('income-tax').textContent = formatCurrency(data.taxes.income_tax);
+      document.getElementById('zus-payment').textContent = formatCurrency(data.taxes.zus);
+      
+      // Summary section
+      document.getElementById('summary-income').textContent = formatCurrency(data.income.total);
+      document.getElementById('summary-expenses').textContent = formatCurrency(data.expenses.total);
+      document.getElementById('summary-taxes').textContent = formatCurrency(data.taxes.total);
+      document.getElementById('net-profit').textContent = formatCurrency(data.net_profit);
+    }
+    
+    function formatCurrency(amount) {
+      return parseFloat(amount).toFixed(2) + ' PLN';
+    }
+  });
+</script>

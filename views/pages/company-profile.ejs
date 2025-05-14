@@ -1,0 +1,483 @@
+<div class="card">
+  <div class="card-header">
+    <h2>Profil firmy</h2>
+  </div>
+  <div class="card-body">
+    <ul class="nav nav-tabs">
+      <li class="nav-item">
+        <a class="nav-link active" id="info-tab" href="#info">Informacje o firmie</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" id="zus-tab" href="#zus">Ustawienia ZUS</a>
+      </li>
+    </ul>
+
+    <div class="tab-content">
+      <div class="tab-pane active" id="info">
+        <form id="company-form" class="mt-3">
+          <div class="form-group">
+            <label for="company_name">Nazwa firmy</label>
+            <input type="text" id="company_name" name="company_name" required>
+          </div>
+          <div class="form-group">
+            <label for="nip">NIP</label>
+            <div class="input-group">
+              <input type="text" id="nip" name="nip" required>
+              <button type="button" id="fetch-company-data" class="btn">Pobierz dane</button>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="regon">REGON</label>
+            <input type="text" id="regon" name="regon">
+          </div>
+          <div class="form-group">
+            <label for="address">Adres</label>
+            <input type="text" id="address" name="address">
+          </div>
+          <div class="form-group">
+            <label for="city">Miasto</label>
+            <input type="text" id="city" name="city">
+          </div>
+          <div class="form-group">
+            <label for="postal_code">Kod pocztowy</label>
+            <input type="text" id="postal_code" name="postal_code">
+          </div>
+          <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email">
+          </div>
+          <div class="form-group">
+            <label for="phone">Telefon</label>
+            <input type="text" id="phone" name="phone">
+          </div>
+          <div class="form-group">
+            <label for="bank_account">Numer konta bankowego</label>
+            <input type="text" id="bank_account" name="bank_account">
+          </div>
+          <div class="form-group">
+            <label for="tax_type">Forma opodatkowania</label>
+            <select id="tax_type" name="tax_type">
+              <option value="ryczalt">Ryczałt</option>
+              <option value="liniowy">Podatek liniowy</option>
+              <option value="skala">Skala podatkowa</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="tax_rate">Stawka podatku (%)</label>
+            <input type="number" id="tax_rate" name="tax_rate" value="12" min="0" max="100" step="0.01">
+          </div>
+          <div class="form-group">
+            <label for="vat_rate">Stawka VAT (%)</label>
+            <input type="number" id="vat_rate" name="vat_rate" value="23" min="0" max="100" step="0.01">
+          </div>
+          <button type="submit" class="btn">Zapisz</button>
+        </form>
+      </div>
+
+      <div class="tab-pane" id="zus">
+        <div class="zus-settings mt-3">
+          <div class="row">
+            <div class="col-md-6">
+              <h3>ZUS Contribution Settings</h3>
+              <p>Configure your ZUS (Social Security) contribution rates and amounts.</p>
+              
+              <div class="form-group">
+                <label for="base_amount">Base Amount (PLN)</label>
+                <div class="input-group">
+                  <input type="number" id="base_amount" class="form-control" value="5203.80" step="0.01">
+                  <button id="reset_base" class="btn btn-sm">Reset</button>
+                </div>
+                <small class="text-muted">The base amount used for calculating ZUS contributions (e.g., 5203.80 PLN for 2025)</small>
+              </div>
+              
+              <h4>Mandatory Insurance</h4>
+              
+              <div class="form-group">
+                <label for="retirement_rate">Retirement Insurance Rate (%)</label>
+                <div class="input-group">
+                  <input type="number" id="retirement_rate" class="form-control" value="19.52" step="0.01">
+                  <button id="reset_retirement" class="btn btn-sm">Reset</button>
+                </div>
+                <small class="text-muted">Default: 19.52%</small>
+              </div>
+              
+              <div class="form-group">
+                <label for="disability_rate">Disability Insurance Rate (%)</label>
+                <div class="input-group">
+                  <input type="number" id="disability_rate" class="form-control" value="8.00" step="0.01">
+                  <button id="reset_disability" class="btn btn-sm">Reset</button>
+                </div>
+                <small class="text-muted">Default: 8.00%</small>
+              </div>
+              
+              <div class="form-group">
+                <label for="accident_rate">Accident Insurance Rate (%)</label>
+                <div class="input-group">
+                  <input type="number" id="accident_rate" class="form-control" value="1.67" step="0.01">
+                  <button id="reset_accident" class="btn btn-sm">Reset</button>
+                </div>
+                <small class="text-muted">Default: 1.67%</small>
+              </div>
+              
+              <div class="form-group">
+                <label for="sickness_rate">Sickness Insurance Rate (%)</label>
+                <div class="input-group">
+                  <input type="number" id="sickness_rate" class="form-control" value="2.45" step="0.01">
+                  <button id="reset_sickness" class="btn btn-sm">Reset</button>
+                </div>
+                <small class="text-muted">Default: 2.45% (Optional)</small>
+                <div class="form-check">
+                  <input type="checkbox" id="sickness_optional" class="form-check-input" checked>
+                  <label for="sickness_optional" class="form-check-label">Include Sickness Insurance</label>
+                </div>
+              </div>
+              
+              <div class="form-group">
+                <label for="health_insurance">Health Insurance (PLN)</label>
+                <input type="number" id="health_insurance" class="form-control" value="461.66" step="0.01">
+                <small class="text-muted">Fixed amount based on income threshold</small>
+              </div>
+              
+              <div class="form-group">
+                <label for="labor_fund_rate">Labor Fund Rate (%)</label>
+                <div class="input-group">
+                  <input type="number" id="labor_fund_rate" class="form-control" value="2.45" step="0.01">
+                  <button id="reset_labor" class="btn btn-sm">Reset</button>
+                </div>
+                <small class="text-muted">Default: 2.45%</small>
+              </div>
+              
+              <div class="form-group">
+                <label for="fep_rate">FEP (Bridging Pensions Fund) Rate (%)</label>
+                <div class="input-group">
+                  <input type="number" id="fep_rate" class="form-control" value="0.00" step="0.01">
+                  <button id="reset_fep" class="btn btn-sm">Reset</button>
+                </div>
+                <small class="text-muted">Default: 0.00% (Only applicable for certain professions)</small>
+              </div>
+              
+              <button id="save_zus_settings" class="btn btn-primary mt-3">Save ZUS Settings</button>
+            </div>
+            
+            <div class="col-md-6">
+              <h3>Calculated Monthly Contributions</h3>
+              
+              <div class="card">
+                <div class="card-body">
+                  <div class="finance-item">
+                    <div class="finance-item-title">Retirement Insurance:</div>
+                    <div class="finance-item-amount" id="retirement_amount">1015.78 PLN</div>
+                  </div>
+                  
+                  <div class="finance-item">
+                    <div class="finance-item-title">Disability Insurance:</div>
+                    <div class="finance-item-amount" id="disability_amount">416.30 PLN</div>
+                  </div>
+                  
+                  <div class="finance-item">
+                    <div class="finance-item-title">Accident Insurance:</div>
+                    <div class="finance-item-amount" id="accident_amount">86.90 PLN</div>
+                  </div>
+                  
+                  <div class="finance-item">
+                    <div class="finance-item-title">Sickness Insurance:</div>
+                    <div class="finance-item-amount" id="sickness_amount">127.49 PLN</div>
+                  </div>
+                  
+                  <div class="finance-item">
+                    <div class="finance-item-title">Labor Fund:</div>
+                    <div class="finance-item-amount" id="labor_fund_amount">127.49 PLN</div>
+                  </div>
+                  
+                  <div class="finance-item">
+                    <div class="finance-item-title">FEP (Bridging Pensions Fund):</div>
+                    <div class="finance-item-amount" id="fep_amount">0.00 PLN</div>
+                  </div>
+                  
+                  <div class="finance-item">
+                    <div class="finance-item-title">Social Insurance Total:</div>
+                    <div class="finance-item-amount" id="social_insurance_total">1646.47 PLN</div>
+                  </div>
+                  
+                  <div class="finance-item">
+                    <div class="finance-item-title">Health Insurance:</div>
+                    <div class="finance-item-amount" id="health_insurance_amount">461.66 PLN</div>
+                  </div>
+                  
+                  <div class="finance-item total-item">
+                    <div class="finance-item-title"><strong>TOTAL ZUS MONTHLY PAYMENT:</strong></div>
+                    <div class="finance-item-amount" id="total_zus_payment"><strong>2108.13 PLN</strong></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Tab switching
+    const tabs = document.querySelectorAll('.nav-link');
+    const tabPanes = document.querySelectorAll('.tab-pane');
+    
+    tabs.forEach(tab => {
+      tab.addEventListener('click', function(e) {
+        e.preventDefault();
+        
+        // Remove active class from all tabs and panes
+        tabs.forEach(t => t.classList.remove('active'));
+        tabPanes.forEach(p => p.classList.remove('active'));
+        
+        // Add active class to clicked tab and corresponding pane
+        this.classList.add('active');
+        const target = this.getAttribute('href').substring(1);
+        document.getElementById(target).classList.add('active');
+      });
+    });
+    
+    // ZUS calculations
+    function calculateZUS() {
+      const baseAmount = parseFloat(document.getElementById('base_amount').value) || 0;
+      const retirementRate = parseFloat(document.getElementById('retirement_rate').value) / 100 || 0;
+      const disabilityRate = parseFloat(document.getElementById('disability_rate').value) / 100 || 0;
+      const accidentRate = parseFloat(document.getElementById('accident_rate').value) / 100 || 0;
+      const sicknessRate = document.getElementById('sickness_optional').checked ? 
+                          (parseFloat(document.getElementById('sickness_rate').value) / 100 || 0) : 0;
+      const healthInsurance = parseFloat(document.getElementById('health_insurance').value) || 0;
+      const laborFundRate = parseFloat(document.getElementById('labor_fund_rate').value) / 100 || 0;
+      const fepRate = parseFloat(document.getElementById('fep_rate').value) / 100 || 0;
+      
+      // Calculate individual contributions
+      const retirementAmount = baseAmount * retirementRate;
+      const disabilityAmount = baseAmount * disabilityRate;
+      const accidentAmount = baseAmount * accidentRate;
+      const sicknessAmount = baseAmount * sicknessRate;
+      const laborFundAmount = baseAmount * laborFundRate;
+      const fepAmount = baseAmount * fepRate;
+      
+      // Calculate totals
+      const socialInsuranceTotal = retirementAmount + disabilityAmount + accidentAmount + sicknessAmount + laborFundAmount + fepAmount;
+      const totalZusPayment = socialInsuranceTotal + healthInsurance;
+      
+      // Update UI
+      document.getElementById('retirement_amount').textContent = retirementAmount.toFixed(2) + ' PLN';
+      document.getElementById('disability_amount').textContent = disabilityAmount.toFixed(2) + ' PLN';
+      document.getElementById('accident_amount').textContent = accidentAmount.toFixed(2) + ' PLN';
+      document.getElementById('sickness_amount').textContent = sicknessAmount.toFixed(2) + ' PLN';
+      document.getElementById('labor_fund_amount').textContent = laborFundAmount.toFixed(2) + ' PLN';
+      document.getElementById('fep_amount').textContent = fepAmount.toFixed(2) + ' PLN';
+      document.getElementById('social_insurance_total').textContent = socialInsuranceTotal.toFixed(2) + ' PLN';
+      document.getElementById('health_insurance_amount').textContent = healthInsurance.toFixed(2) + ' PLN';
+      document.getElementById('total_zus_payment').textContent = totalZusPayment.toFixed(2) + ' PLN';
+    }
+    
+    // Add event listeners to all input fields
+    const zusInputs = document.querySelectorAll('#zus input');
+    zusInputs.forEach(input => {
+      input.addEventListener('input', calculateZUS);
+      input.addEventListener('change', calculateZUS);
+    });
+    
+    // Reset buttons
+    document.getElementById('reset_base').addEventListener('click', function() {
+      document.getElementById('base_amount').value = '5203.80';
+      calculateZUS();
+    });
+    
+    document.getElementById('reset_retirement').addEventListener('click', function() {
+      document.getElementById('retirement_rate').value = '19.52';
+      calculateZUS();
+    });
+    
+    document.getElementById('reset_disability').addEventListener('click', function() {
+      document.getElementById('disability_rate').value = '8.00';
+      calculateZUS();
+    });
+    
+    document.getElementById('reset_accident').addEventListener('click', function() {
+      document.getElementById('accident_rate').value = '1.67';
+      calculateZUS();
+    });
+    
+    document.getElementById('reset_sickness').addEventListener('click', function() {
+      document.getElementById('sickness_rate').value = '2.45';
+      calculateZUS();
+    });
+    
+    document.getElementById('reset_labor').addEventListener('click', function() {
+      document.getElementById('labor_fund_rate').value = '2.45';
+      calculateZUS();
+    });
+    
+    document.getElementById('reset_fep').addEventListener('click', function() {
+      document.getElementById('fep_rate').value = '0.00';
+      calculateZUS();
+    });
+    
+    // Initial calculation
+    calculateZUS();
+    
+    // Company form submission
+    document.getElementById('company-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      const formData = new FormData(this);
+      const data = {};
+      
+      formData.forEach((value, key) => {
+        data[key] = value;
+      });
+      
+      fetch('/api/company-profile', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Failed to save company profile');
+        }
+        return response.json();
+      })
+      .then(data => {
+        alert('Company profile saved successfully!');
+      })
+      .catch(error => {
+        alert('Error: ' + error.message);
+      });
+    });
+    
+    // Fetch company data by NIP
+    document.getElementById('fetch-company-data').addEventListener('click', function() {
+      const nip = document.getElementById('nip').value.replace(/[^0-9]/g, '');
+      
+      if (nip.length !== 10) {
+        alert('NIP must be 10 digits');
+        return;
+      }
+      
+      fetch(`/api/company-lookup?nip=${nip}`)
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Failed to fetch company data');
+        }
+        return response.json();
+      })
+      .then(data => {
+        if (data.company) {
+          document.getElementById('company_name').value = data.company.name || '';
+          document.getElementById('regon').value = data.company.regon || '';
+          document.getElementById('address').value = data.company.street || '';
+          document.getElementById('city').value = data.company.city || '';
+          document.getElementById('postal_code').value = data.company.postalCode || '';
+        } else {
+          alert('Company not found');
+        }
+      })
+      .catch(error => {
+        alert('Error: ' + error.message);
+      });
+    });
+    
+    // Save ZUS settings
+    document.getElementById('save_zus_settings').addEventListener('click', function() {
+      const zusSettings = {
+        base_amount: parseFloat(document.getElementById('base_amount').value),
+        retirement_rate: parseFloat(document.getElementById('retirement_rate').value),
+        disability_rate: parseFloat(document.getElementById('disability_rate').value),
+        accident_rate: parseFloat(document.getElementById('accident_rate').value),
+        sickness_rate: parseFloat(document.getElementById('sickness_rate').value),
+        sickness_optional: document.getElementById('sickness_optional').checked,
+        health_insurance: parseFloat(document.getElementById('health_insurance').value),
+        labor_fund_rate: parseFloat(document.getElementById('labor_fund_rate').value),
+        fep_rate: parseFloat(document.getElementById('fep_rate').value)
+      };
+      
+      fetch('/api/zus-settings', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(zusSettings)
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Failed to save ZUS settings');
+        }
+        return response.json();
+      })
+      .then(data => {
+        alert('ZUS settings saved successfully!');
+      })
+      .catch(error => {
+        alert('Error: ' + error.message);
+      });
+    });
+    
+    // Load company profile and ZUS settings on page load
+    fetch('/api/company-profile')
+    .then(response => {
+      if (!response.ok) {
+        if (response.status === 404) {
+          return null; // No profile yet
+        }
+        throw new Error('Failed to load company profile');
+      }
+      return response.json();
+    })
+    .then(data => {
+      if (data) {
+        document.getElementById('company_name').value = data.company_name || '';
+        document.getElementById('nip').value = data.nip || '';
+        document.getElementById('regon').value = data.regon || '';
+        document.getElementById('address').value = data.address || '';
+        document.getElementById('city').value = data.city || '';
+        document.getElementById('postal_code').value = data.postal_code || '';
+        document.getElementById('email').value = data.email || '';
+        document.getElementById('phone').value = data.phone || '';
+        document.getElementById('bank_account').value = data.bank_account || '';
+        document.getElementById('tax_type').value = data.tax_type || 'ryczalt';
+        document.getElementById('tax_rate').value = data.tax_rate || '12';
+        document.getElementById('vat_rate').value = data.vat_rate || '23';
+      }
+    })
+    .catch(error => {
+      console.error('Error loading company profile:', error);
+    });
+    
+    fetch('/api/zus-settings')
+    .then(response => {
+      if (!response.ok) {
+        if (response.status === 404) {
+          return null; // No settings yet
+        }
+        throw new Error('Failed to load ZUS settings');
+      }
+      return response.json();
+    })
+    .then(data => {
+      if (data) {
+        document.getElementById('base_amount').value = data.base_amount || '5203.80';
+        document.getElementById('retirement_rate').value = data.retirement_rate || '19.52';
+        document.getElementById('disability_rate').value = data.disability_rate || '8.00';
+        document.getElementById('accident_rate').value = data.accident_rate || '1.67';
+        document.getElementById('sickness_rate').value = data.sickness_rate || '2.45';
+        document.getElementById('sickness_optional').checked = data.sickness_optional !== false;
+        document.getElementById('health_insurance').value = data.health_insurance || '461.66';
+        document.getElementById('labor_fund_rate').value = data.labor_fund_rate || '2.45';
+        document.getElementById('fep_rate').value = data.fep_rate || '0.00';
+        
+        calculateZUS();
+      }
+    })
+    .catch(error => {
+      console.error('Error loading ZUS settings:', error);
+    });
+  });
+</script>

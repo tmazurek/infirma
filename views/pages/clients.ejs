@@ -1,0 +1,258 @@
+<div class="dashboard-greeting">
+  <div class="greeting-text">
+    <h1>Klienci</h1>
+  </div>
+  <div class="action-buttons">
+    <button id="add-client-btn" class="action-button primary">
+      <i class="fas fa-plus"></i> Dodaj nowego klienta
+    </button>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header">
+    <h2>Lista klientów</h2>
+    <div class="search-container">
+      <input type="text" id="client-search" placeholder="Szukaj klienta..." class="search-input">
+      <i class="fas fa-search search-icon"></i>
+    </div>
+  </div>
+  <div class="card-body">
+    <table id="clients-table">
+      <thead>
+        <tr>
+          <th>Nazwa</th>
+          <th>NIP</th>
+          <th>Email</th>
+          <th>Telefon</th>
+          <th>Akcje</th>
+        </tr>
+      </thead>
+      <tbody id="clients-table-body">
+        <% if (clients && clients.length > 0) { %>
+          <% clients.forEach(client => { %>
+            <tr>
+              <td><%= client.name %></td>
+              <td><%= client.nip %></td>
+              <td><%= client.email %></td>
+              <td><%= client.phone %></td>
+              <td>
+                <button class="btn-sm edit-client" data-id="<%= client.id %>">
+                  <i class="fas fa-edit"></i>
+                </button>
+                <button class="btn-sm btn-warning delete-client" data-id="<%= client.id %>">
+                  <i class="fas fa-trash"></i>
+                </button>
+              </td>
+            </tr>
+          <% }); %>
+        <% } else { %>
+          <tr>
+            <td colspan="5" class="text-center">Brak klientów. Dodaj pierwszego klienta!</td>
+          </tr>
+        <% } %>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Client Modal -->
+<div id="client-modal" class="modal">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <h3 id="modal-title">Dodaj nowego klienta</h3>
+    
+    <form id="client-form">
+      <input type="hidden" id="client-id">
+      
+      <div class="form-group">
+        <label for="client-name">Nazwa firmy / Imię i nazwisko</label>
+        <input type="text" id="client-name" name="name" required>
+      </div>
+      
+      <div class="form-group">
+        <label for="client-nip">NIP</label>
+        <input type="text" id="client-nip" name="nip">
+      </div>
+      
+      <div class="form-group">
+        <label for="client-address">Adres</label>
+        <input type="text" id="client-address" name="address">
+      </div>
+      
+      <div class="form-group">
+        <label for="client-city">Miasto</label>
+        <input type="text" id="client-city" name="city">
+      </div>
+      
+      <div class="form-group">
+        <label for="client-postal-code">Kod pocztowy</label>
+        <input type="text" id="client-postal-code" name="postal_code">
+      </div>
+      
+      <div class="form-group">
+        <label for="client-email">Email</label>
+        <input type="email" id="client-email" name="email">
+      </div>
+      
+      <div class="form-group">
+        <label for="client-phone">Telefon</label>
+        <input type="text" id="client-phone" name="phone">
+      </div>
+      
+      <button type="submit" class="btn">Zapisz</button>
+    </form>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // DOM Elements
+    const addClientBtn = document.getElementById('add-client-btn');
+    const clientModal = document.getElementById('client-modal');
+    const closeBtn = document.querySelector('.close');
+    const clientForm = document.getElementById('client-form');
+    const clientIdInput = document.getElementById('client-id');
+    const modalTitle = document.getElementById('modal-title');
+    const clientSearch = document.getElementById('client-search');
+    
+    // Event Listeners
+    addClientBtn.addEventListener('click', showAddClientModal);
+    closeBtn.addEventListener('click', closeModal);
+    clientForm.addEventListener('submit', saveClient);
+    clientSearch.addEventListener('input', searchClients);
+    
+    // Add event listeners to edit and delete buttons
+    document.querySelectorAll('.edit-client').forEach(btn => {
+      btn.addEventListener('click', function() {
+        const clientId = this.getAttribute('data-id');
+        editClient(clientId);
+      });
+    });
+    
+    document.querySelectorAll('.delete-client').forEach(btn => {
+      btn.addEventListener('click', function() {
+        const clientId = this.getAttribute('data-id');
+        deleteClient(clientId);
+      });
+    });
+    
+    // Functions
+    function showAddClientModal() {
+      clientForm.reset();
+      clientIdInput.value = '';
+      modalTitle.textContent = 'Dodaj nowego klienta';
+      clientModal.style.display = 'block';
+    }
+    
+    function closeModal() {
+      clientModal.style.display = 'none';
+    }
+    
+    function saveClient(e) {
+      e.preventDefault();
+      
+      const clientId = clientIdInput.value;
+      const formData = new FormData(clientForm);
+      const clientData = {};
+      
+      formData.forEach((value, key) => {
+        clientData[key] = value;
+      });
+      
+      const url = clientId ? `/api/clients/${clientId}` : '/api/clients';
+      const method = clientId ? 'PUT' : 'POST';
+      
+      fetch(url, {
+        method: method,
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(clientData)
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Failed to save client');
+        }
+        return response.json();
+      })
+      .then(data => {
+        closeModal();
+        window.location.reload(); // Reload to show updated client list
+      })
+      .catch(error => {
+        alert('Error: ' + error.message);
+      });
+    }
+    
+    function editClient(clientId) {
+      fetch(`/api/clients/${clientId}`)
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Failed to fetch client details');
+        }
+        return response.json();
+      })
+      .then(client => {
+        clientIdInput.value = client.id;
+        document.getElementById('client-name').value = client.name || '';
+        document.getElementById('client-nip').value = client.nip || '';
+        document.getElementById('client-address').value = client.address || '';
+        document.getElementById('client-city').value = client.city || '';
+        document.getElementById('client-postal-code').value = client.postal_code || '';
+        document.getElementById('client-email').value = client.email || '';
+        document.getElementById('client-phone').value = client.phone || '';
+        
+        modalTitle.textContent = 'Edytuj klienta';
+        clientModal.style.display = 'block';
+      })
+      .catch(error => {
+        alert('Error: ' + error.message);
+      });
+    }
+    
+    function deleteClient(clientId) {
+      if (confirm('Czy na pewno chcesz usunąć tego klienta?')) {
+        fetch(`/api/clients/${clientId}`, {
+          method: 'DELETE'
+        })
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Failed to delete client');
+          }
+          return response.json();
+        })
+        .then(data => {
+          window.location.reload(); // Reload to update client list
+        })
+        .catch(error => {
+          alert('Error: ' + error.message);
+        });
+      }
+    }
+    
+    function searchClients() {
+      const searchTerm = clientSearch.value.toLowerCase();
+      const rows = document.querySelectorAll('#clients-table-body tr');
+      
+      rows.forEach(row => {
+        const name = row.cells[0].textContent.toLowerCase();
+        const nip = row.cells[1].textContent.toLowerCase();
+        const email = row.cells[2].textContent.toLowerCase();
+        
+        if (name.includes(searchTerm) || nip.includes(searchTerm) || email.includes(searchTerm)) {
+          row.style.display = '';
+        } else {
+          row.style.display = 'none';
+        }
+      });
+    }
+    
+    // Close modal when clicking outside of it
+    window.addEventListener('click', function(event) {
+      if (event.target === clientModal) {
+        closeModal();
+      }
+    });
+  });
+</script>
