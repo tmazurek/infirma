@@ -26,6 +26,7 @@ router.get('/', (req, res) => {
       health_insurance: profile.zus_health_insurance_amount,
       labor_fund_rate: profile.zus_labor_fund_rate,
       fep_rate: profile.zus_fep_rate,
+      fep_optional: profile.zus_fep_optional,
       health_insurance_income_threshold: profile.zus_health_insurance_income_threshold
     };
 
@@ -60,6 +61,7 @@ router.post('/', (req, res) => {
       zus_health_insurance_amount: req.body.health_insurance,
       zus_labor_fund_rate: req.body.labor_fund_rate,
       zus_fep_rate: req.body.fep_rate,
+      zus_fep_optional: req.body.fep_optional,
       zus_health_insurance_income_threshold: req.body.health_insurance_income_threshold || 'low'
     };
 
@@ -81,6 +83,7 @@ router.post('/', (req, res) => {
         health_insurance: savedProfile.zus_health_insurance_amount,
         labor_fund_rate: savedProfile.zus_labor_fund_rate,
         fep_rate: savedProfile.zus_fep_rate,
+        fep_optional: savedProfile.zus_fep_optional,
         health_insurance_income_threshold: savedProfile.zus_health_insurance_income_threshold
       };
 

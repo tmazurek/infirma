@@ -23,6 +23,7 @@ function migrateDatabase() {
       "ALTER TABLE CompanyProfile ADD COLUMN zus_sickness_optional INTEGER DEFAULT 1",
       "ALTER TABLE CompanyProfile ADD COLUMN zus_labor_fund_rate REAL DEFAULT 2.45",
       "ALTER TABLE CompanyProfile ADD COLUMN zus_fep_rate REAL DEFAULT 0.1",
+      "ALTER TABLE CompanyProfile ADD COLUMN zus_fep_optional INTEGER DEFAULT 0",
       "ALTER TABLE CompanyProfile ADD COLUMN zus_health_insurance_amount REAL DEFAULT 0.0",
       "ALTER TABLE CompanyProfile ADD COLUMN zus_health_insurance_income_threshold TEXT DEFAULT 'low'"
     ];
