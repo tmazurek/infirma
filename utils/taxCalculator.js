@@ -93,7 +93,7 @@ function calculateVAT(income, expenses, vatRate) {
 
     // Get VAT paid from expenses
     const expensesSql = `
-      SELECT SUM(amount_gross) - SUM(amount_net) as vat_paid
+      SELECT SUM(vat_amount_paid) as vat_paid
       FROM Expenses
       WHERE expense_date BETWEEN ? AND ?
     `;

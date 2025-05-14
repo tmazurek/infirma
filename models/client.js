@@ -3,8 +3,8 @@ const db = require('../config/database');
 class Client {
   // Get all clients
   static getAllClients(callback) {
-    const sql = 'SELECT * FROM Clients ORDER BY client_name';
-    
+    const sql = 'SELECT * FROM Clients ORDER BY name';
+
     db.all(sql, [], (err, rows) => {
       if (err) {
         return callback(err, null);
@@ -16,16 +16,16 @@ class Client {
   // Get a client by ID
   static getClientById(id, callback) {
     const sql = 'SELECT * FROM Clients WHERE id = ?';
-    
+
     db.get(sql, [id], (err, row) => {
       if (err) {
         return callback(err, null);
       }
-      
+
       if (!row) {
         return callback(new Error('Client not found'), null);
       }
-      
+
       callback(null, row);
     });
   }
@@ -33,32 +33,32 @@ class Client {
   // Create a new client
   static createClient(clientData, callback) {
     // Validate required fields
-    if (!clientData.client_name) {
+    if (!clientData.name) {
       return callback(new Error('Client name is required'), null);
     }
-    
+
     const sql = `
       INSERT INTO Clients (
-        client_name, 
-        nip, 
-        street_address, 
-        city, 
-        postal_code, 
-        email, 
-        contact_person
+        name,
+        nip,
+        address,
+        city,
+        postal_code,
+        email,
+        phone
       ) VALUES (?, ?, ?, ?, ?, ?, ?)
     `;
-    
+
     const params = [
-      clientData.client_name,
+      clientData.name,
       clientData.nip || null,
-      clientData.street_address || null,
+      clientData.address || null,
       clientData.city || null,
       clientData.postal_code || null,
       clientData.email || null,
-      clientData.contact_person || null
+      clientData.phone || null
     ];
-    
+
     db.run(sql, params, function(err) {
       if (err) {
         // Check for unique constraint violation on NIP
@@ -67,7 +67,7 @@ class Client {
         }
         return callback(err, null);
       }
-      
+
       // Return the created client with its ID
       callback(null, { id: this.lastID, ...clientData });
     });
@@ -80,37 +80,37 @@ class Client {
       if (err) {
         return callback(err, null);
       }
-      
+
       // Validate required fields
-      if (!clientData.client_name) {
+      if (!clientData.name) {
         return callback(new Error('Client name is required'), null);
       }
-      
+
       const sql = `
-        UPDATE Clients 
-        SET 
-          client_name = ?, 
-          nip = ?, 
-          street_address = ?, 
-          city = ?, 
-          postal_code = ?, 
-          email = ?, 
-          contact_person = ?,
+        UPDATE Clients
+        SET
+          name = ?,
+          nip = ?,
+          address = ?,
+          city = ?,
+          postal_code = ?,
+          email = ?,
+          phone = ?,
           updated_at = CURRENT_TIMESTAMP
         WHERE id = ?
       `;
-      
+
       const params = [
-        clientData.client_name,
+        clientData.name,
         clientData.nip || null,
-        clientData.street_address || null,
+        clientData.address || null,
         clientData.city || null,
         clientData.postal_code || null,
         clientData.email || null,
-        clientData.contact_person || null,
+        clientData.phone || null,
         id
       ];
-      
+
       db.run(sql, params, function(err) {
         if (err) {
           // Check for unique constraint violation on NIP
@@ -119,7 +119,7 @@ class Client {
           }
           return callback(err, null);
         }
-        
+
         // Return the updated client
         callback(null, { id: parseInt(id), ...clientData });
       });
@@ -133,19 +133,19 @@ class Client {
       if (err) {
         return callback(err, null);
       }
-      
+
       const sql = 'DELETE FROM Clients WHERE id = ?';
-      
+
       db.run(sql, [id], function(err) {
         if (err) {
           return callback(err, null);
         }
-        
+
         // Check if any rows were affected
         if (this.changes === 0) {
           return callback(new Error('Client not found or already deleted'), null);
         }
-        
+
         callback(null, { id: parseInt(id), deleted: true });
       });
     });

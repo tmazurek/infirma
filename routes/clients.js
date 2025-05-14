@@ -10,7 +10,7 @@ router.get('/', (req, res) => {
       console.error('Error retrieving clients:', err);
       return res.status(500).json({ error: 'Failed to retrieve clients' });
     }
-    
+
     res.json(clients);
   });
 });
@@ -19,17 +19,17 @@ router.get('/', (req, res) => {
 // Retrieve a specific client
 router.get('/:id', (req, res) => {
   const clientId = req.params.id;
-  
+
   Client.getClientById(clientId, (err, client) => {
     if (err) {
       if (err.message === 'Client not found') {
         return res.status(404).json({ error: 'Client not found' });
       }
-      
+
       console.error('Error retrieving client:', err);
       return res.status(500).json({ error: 'Failed to retrieve client' });
     }
-    
+
     res.json(client);
   });
 });
@@ -38,29 +38,29 @@ router.get('/:id', (req, res) => {
 // Create a new client
 router.post('/', (req, res) => {
   const clientData = {
-    client_name: req.body.client_name,
+    name: req.body.name,
     nip: req.body.nip,
-    street_address: req.body.street_address,
+    address: req.body.address,
     city: req.body.city,
     postal_code: req.body.postal_code,
     email: req.body.email,
-    contact_person: req.body.contact_person
+    phone: req.body.phone
   };
-  
+
   Client.createClient(clientData, (err, client) => {
     if (err) {
       if (err.message === 'Client name is required') {
         return res.status(400).json({ error: err.message });
       }
-      
+
       if (err.message === 'A client with this NIP already exists') {
         return res.status(409).json({ error: err.message });
       }
-      
+
       console.error('Error creating client:', err);
       return res.status(500).json({ error: 'Failed to create client' });
     }
-    
+
     res.status(201).json({
       message: 'Client created successfully',
       client: client
@@ -73,33 +73,33 @@ router.post('/', (req, res) => {
 router.put('/:id', (req, res) => {
   const clientId = req.params.id;
   const clientData = {
-    client_name: req.body.client_name,
+    name: req.body.name,
     nip: req.body.nip,
-    street_address: req.body.street_address,
+    address: req.body.address,
     city: req.body.city,
     postal_code: req.body.postal_code,
     email: req.body.email,
-    contact_person: req.body.contact_person
+    phone: req.body.phone
   };
-  
+
   Client.updateClient(clientId, clientData, (err, client) => {
     if (err) {
       if (err.message === 'Client not found') {
         return res.status(404).json({ error: 'Client not found' });
       }
-      
+
       if (err.message === 'Client name is required') {
         return res.status(400).json({ error: err.message });
       }
-      
+
       if (err.message === 'A client with this NIP already exists') {
         return res.status(409).json({ error: err.message });
       }
-      
+
       console.error('Error updating client:', err);
       return res.status(500).json({ error: 'Failed to update client' });
     }
-    
+
     res.json({
       message: 'Client updated successfully',
       client: client
@@ -111,17 +111,17 @@ router.put('/:id', (req, res) => {
 // Delete a client
 router.delete('/:id', (req, res) => {
   const clientId = req.params.id;
-  
+
   Client.deleteClient(clientId, (err, result) => {
     if (err) {
       if (err.message === 'Client not found' || err.message === 'Client not found or already deleted') {
         return res.status(404).json({ error: 'Client not found' });
       }
-      
+
       console.error('Error deleting client:', err);
       return res.status(500).json({ error: 'Failed to delete client' });
     }
-    
+
     res.json({
       message: 'Client deleted successfully',
       result: result
