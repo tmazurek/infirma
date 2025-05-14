@@ -31,15 +31,15 @@ const db = new sqlite3.Database(dbPath, (err) => {
     console.error('Error creating database:', err.message);
     process.exit(1);
   }
-  
+
   console.log('New database created successfully.');
-  
+
   // Step 4: Initialize the database schema
   console.log('Initializing database schema...');
-  
+
   // Enable foreign keys
   db.run('PRAGMA foreign_keys = ON');
-  
+
   // Create tables
   const createTablesSQL = `
     -- Company Profile table
@@ -60,6 +60,7 @@ const db = new sqlite3.Database(dbPath, (err) => {
       zus_sickness_optional INTEGER DEFAULT 1,
       zus_labor_fund_rate REAL DEFAULT 2.45,
       zus_fep_rate REAL DEFAULT 0.1,
+      zus_fep_optional INTEGER DEFAULT 0,
       zus_health_insurance_amount REAL DEFAULT 0.0,
       zus_health_insurance_income_threshold TEXT DEFAULT 'low',
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -128,22 +129,22 @@ const db = new sqlite3.Database(dbPath, (err) => {
       updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
   `;
-  
+
   db.exec(createTablesSQL, (err) => {
     if (err) {
       console.error('Error initializing database schema:', err.message);
       process.exit(1);
     }
-    
+
     console.log('Database schema initialized successfully.');
-    
+
     // Close the database connection
     db.close((err) => {
       if (err) {
         console.error('Error closing database connection:', err.message);
         process.exit(1);
       }
-      
+
       console.log('Database reset completed successfully!');
     });
   });
