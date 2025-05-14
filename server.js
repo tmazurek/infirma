@@ -15,6 +15,7 @@ const invoicesRoutes = require('./routes/invoices');
 const expensesRoutes = require('./routes/expenses');
 const financialSummaryRoutes = require('./routes/financialSummary');
 const nipValidatorRoutes = require('./routes/nipValidator');
+const zusSettingsRoutes = require('./routes/zusSettings');
 
 // Middleware
 app.use(express.json());
@@ -34,6 +35,7 @@ app.use('/api/invoices', invoicesRoutes);
 app.use('/api/expenses', expensesRoutes);
 app.use('/api/financial-summary', financialSummaryRoutes);
 app.use('/api/validate-nip', nipValidatorRoutes);
+app.use('/api/zus-settings', zusSettingsRoutes);
 
 // Frontend Routes
 app.get('/', async (req, res) => {

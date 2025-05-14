@@ -43,6 +43,7 @@ class CompanyProfile {
             zus_disability_rate = ?,
             zus_accident_rate = ?,
             zus_sickness_rate = ?,
+            zus_sickness_optional = ?,
             zus_labor_fund_rate = ?,
             zus_fep_rate = ?,
             zus_health_insurance_amount = ?,
@@ -64,6 +65,7 @@ class CompanyProfile {
           profileData.zus_disability_rate || 8.0,
           profileData.zus_accident_rate || 1.67,
           profileData.zus_sickness_rate || 2.45,
+          profileData.zus_sickness_optional !== undefined ? profileData.zus_sickness_optional : 1,
           profileData.zus_labor_fund_rate || 2.45,
           profileData.zus_fep_rate || 0.1,
           profileData.zus_health_insurance_amount || 0.0,
@@ -93,11 +95,12 @@ class CompanyProfile {
             zus_disability_rate,
             zus_accident_rate,
             zus_sickness_rate,
+            zus_sickness_optional,
             zus_labor_fund_rate,
             zus_fep_rate,
             zus_health_insurance_amount,
             zus_health_insurance_income_threshold
-          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         `;
 
         const params = [
@@ -113,6 +116,7 @@ class CompanyProfile {
           profileData.zus_disability_rate || 8.0,
           profileData.zus_accident_rate || 1.67,
           profileData.zus_sickness_rate || 2.45,
+          profileData.zus_sickness_optional !== undefined ? profileData.zus_sickness_optional : 1,
           profileData.zus_labor_fund_rate || 2.45,
           profileData.zus_fep_rate || 0.1,
           profileData.zus_health_insurance_amount || 0.0,
