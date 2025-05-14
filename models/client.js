@@ -3,7 +3,7 @@ const db = require('../config/database');
 class Client {
   // Get all clients
   static getAllClients(callback) {
-    const sql = 'SELECT * FROM Clients ORDER BY name';
+    const sql = 'SELECT * FROM Clients ORDER BY client_name';
 
     db.all(sql, [], (err, rows) => {
       if (err) {
@@ -33,30 +33,30 @@ class Client {
   // Create a new client
   static createClient(clientData, callback) {
     // Validate required fields
-    if (!clientData.name) {
+    if (!clientData.client_name) {
       return callback(new Error('Client name is required'), null);
     }
 
     const sql = `
       INSERT INTO Clients (
-        name,
+        client_name,
         nip,
-        address,
+        street_address,
         city,
         postal_code,
         email,
-        phone
+        contact_person
       ) VALUES (?, ?, ?, ?, ?, ?, ?)
     `;
 
     const params = [
-      clientData.name,
+      clientData.client_name,
       clientData.nip || null,
-      clientData.address || null,
+      clientData.street_address || null,
       clientData.city || null,
       clientData.postal_code || null,
       clientData.email || null,
-      clientData.phone || null
+      clientData.contact_person || null
     ];
 
     db.run(sql, params, function(err) {
@@ -82,32 +82,32 @@ class Client {
       }
 
       // Validate required fields
-      if (!clientData.name) {
+      if (!clientData.client_name) {
         return callback(new Error('Client name is required'), null);
       }
 
       const sql = `
         UPDATE Clients
         SET
-          name = ?,
+          client_name = ?,
           nip = ?,
-          address = ?,
+          street_address = ?,
           city = ?,
           postal_code = ?,
           email = ?,
-          phone = ?,
+          contact_person = ?,
           updated_at = CURRENT_TIMESTAMP
         WHERE id = ?
       `;
 
       const params = [
-        clientData.name,
+        clientData.client_name,
         clientData.nip || null,
-        clientData.address || null,
+        clientData.street_address || null,
         clientData.city || null,
         clientData.postal_code || null,
         clientData.email || null,
-        clientData.phone || null,
+        clientData.contact_person || null,
         id
       ];
 

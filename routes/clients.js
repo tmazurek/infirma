@@ -38,13 +38,13 @@ router.get('/:id', (req, res) => {
 // Create a new client
 router.post('/', (req, res) => {
   const clientData = {
-    name: req.body.name,
+    client_name: req.body.client_name,
     nip: req.body.nip,
-    address: req.body.address,
+    street_address: req.body.street_address,
     city: req.body.city,
     postal_code: req.body.postal_code,
     email: req.body.email,
-    phone: req.body.phone
+    contact_person: req.body.contact_person
   };
 
   Client.createClient(clientData, (err, client) => {
@@ -73,13 +73,13 @@ router.post('/', (req, res) => {
 router.put('/:id', (req, res) => {
   const clientId = req.params.id;
   const clientData = {
-    name: req.body.name,
+    client_name: req.body.client_name,
     nip: req.body.nip,
-    address: req.body.address,
+    street_address: req.body.street_address,
     city: req.body.city,
     postal_code: req.body.postal_code,
     email: req.body.email,
-    phone: req.body.phone
+    contact_person: req.body.contact_person
   };
 
   Client.updateClient(clientId, clientData, (err, client) => {
