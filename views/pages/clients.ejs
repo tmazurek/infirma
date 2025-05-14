@@ -72,7 +72,11 @@
 
       <div class="form-group">
         <label for="client-nip">NIP</label>
-        <input type="text" id="client-nip" name="nip">
+        <div class="input-with-button">
+          <input type="text" id="client-nip" name="nip">
+          <button type="button" id="lookup-nip-btn" class="btn-sm">Wyszukaj</button>
+        </div>
+        <small id="nip-lookup-status"></small>
       </div>
 
       <div class="form-group">
@@ -121,6 +125,19 @@
     closeBtn.addEventListener('click', closeModal);
     clientForm.addEventListener('submit', saveClient);
     clientSearch.addEventListener('input', searchClients);
+
+    // Add NIP lookup functionality
+    const lookupNipBtn = document.getElementById('lookup-nip-btn');
+    const nipInput = document.getElementById('client-nip');
+    const nipLookupStatus = document.getElementById('nip-lookup-status');
+
+    lookupNipBtn.addEventListener('click', lookupClientByNip);
+    nipInput.addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        lookupClientByNip();
+      }
+    });
 
     // Add event listeners to edit and delete buttons
     document.querySelectorAll('.edit-client').forEach(btn => {
@@ -246,6 +263,48 @@
           row.style.display = 'none';
         }
       });
+    }
+
+    function lookupClientByNip() {
+      const nip = nipInput.value.trim();
+
+      if (!nip) {
+        nipLookupStatus.textContent = 'Wprowadź NIP';
+        nipLookupStatus.style.color = 'red';
+        return;
+      }
+
+      // Show loading status
+      nipLookupStatus.textContent = 'Wyszukiwanie...';
+      nipLookupStatus.style.color = 'blue';
+
+      // Call the company lookup API
+      fetch(`/api/company-lookup?nip=${nip}`)
+        .then(response => {
+          if (!response.ok) {
+            throw new Error(response.status === 404 ? 'Nie znaleziono firmy o podanym NIP' : 'Błąd podczas wyszukiwania');
+          }
+          return response.json();
+        })
+        .then(company => {
+          // Fill the form with company data
+          document.getElementById('client-name').value = company.name || '';
+          document.getElementById('client-address').value = company.address?.street || '';
+          document.getElementById('client-city').value = company.address?.city || '';
+          document.getElementById('client-postal-code').value = company.address?.postalCode || '';
+
+          // Show success message
+          nipLookupStatus.textContent = 'Dane firmy pobrane pomyślnie';
+          nipLookupStatus.style.color = 'green';
+
+          // Focus on the next field that might need input
+          document.getElementById('client-email').focus();
+        })
+        .catch(error => {
+          console.error('Error looking up company:', error);
+          nipLookupStatus.textContent = error.message || 'Błąd podczas wyszukiwania';
+          nipLookupStatus.style.color = 'red';
+        });
     }
 
     // Close modal when clicking outside of it

@@ -163,6 +163,18 @@ app.get('/clients', async (req, res) => {
         .close:hover {
           color: #000;
         }
+        .input-with-button {
+          display: flex;
+          gap: 8px;
+        }
+        .input-with-button input {
+          flex: 1;
+        }
+        #nip-lookup-status {
+          display: block;
+          margin-top: 5px;
+          font-size: 12px;
+        }
       </style>`,
       scripts: ''
     });
