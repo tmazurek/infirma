@@ -38,27 +38,9 @@ app.use('/api/validate-nip', nipValidatorRoutes);
 app.use('/api/zus-settings', zusSettingsRoutes);
 
 // Frontend Routes
-app.get('/', async (req, res) => {
-  try {
-    // Fetch recent invoices for the dashboard
-    const response = await fetch(`http://localhost:${PORT}/api/invoices?limit=3`);
-    const invoices = await response.json();
-
-    res.render('pages/index', {
-      title: 'Dashboard',
-      invoices: invoices || [],
-      stylesheets: '',
-      scripts: ''
-    });
-  } catch (error) {
-    console.error('Error fetching dashboard data:', error);
-    res.render('pages/index', {
-      title: 'Dashboard',
-      invoices: [],
-      stylesheets: '',
-      scripts: ''
-    });
-  }
+app.get('/', (req, res) => {
+  // Redirect to summary page
+  res.redirect('/summary');
 });
 
 // Company profile page
