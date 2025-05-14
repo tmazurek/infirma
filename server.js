@@ -16,6 +16,7 @@ const expensesRoutes = require('./routes/expenses');
 const financialSummaryRoutes = require('./routes/financialSummary');
 const nipValidatorRoutes = require('./routes/nipValidator');
 const zusSettingsRoutes = require('./routes/zusSettings');
+const companyLookupRoutes = require('./routes/companyLookup');
 
 // Middleware
 app.use(express.json());
@@ -36,6 +37,7 @@ app.use('/api/expenses', expensesRoutes);
 app.use('/api/financial-summary', financialSummaryRoutes);
 app.use('/api/validate-nip', nipValidatorRoutes);
 app.use('/api/zus-settings', zusSettingsRoutes);
+app.use('/api/company-lookup', companyLookupRoutes);
 
 // Frontend Routes
 app.get('/', (req, res) => {
