@@ -175,17 +175,17 @@
     const currentDate = new Date();
     document.getElementById('month').value = currentDate.getMonth() + 1;
     document.getElementById('year').value = currentDate.getFullYear();
-    
+
     // Load summary on page load
     loadSummary();
-    
+
     // Load summary when button is clicked
     document.getElementById('load-summary').addEventListener('click', loadSummary);
-    
+
     function loadSummary() {
       const month = document.getElementById('month').value;
       const year = document.getElementById('year').value;
-      
+
       fetch(`/api/financial-summary?month=${month}&year=${year}`)
         .then(response => {
           if (!response.ok) {
@@ -201,30 +201,42 @@
           alert('Error loading financial summary: ' + error.message);
         });
     }
-    
+
     function updateSummaryUI(data) {
       // Income section
-      document.getElementById('total-income').textContent = formatCurrency(data.income.total);
-      document.getElementById('invoice-count').textContent = data.income.count;
-      document.getElementById('average-invoice').textContent = formatCurrency(data.income.average);
-      
+      const income = data.pit ? data.pit.income : 0;
+      const expenses = data.pit ? data.pit.expenses : 0;
+      const invoiceCount = 0; // We don't have this data directly from the API
+      const averageInvoice = invoiceCount > 0 ? income / invoiceCount : 0;
+
+      document.getElementById('total-income').textContent = formatCurrency(income);
+      document.getElementById('invoice-count').textContent = invoiceCount;
+      document.getElementById('average-invoice').textContent = formatCurrency(averageInvoice);
+
       // Expenses section
-      document.getElementById('total-expenses').textContent = formatCurrency(data.expenses.total);
-      document.getElementById('expense-count').textContent = data.expenses.count;
-      document.getElementById('largest-expense').textContent = formatCurrency(data.expenses.largest);
-      
+      document.getElementById('total-expenses').textContent = formatCurrency(expenses);
+      document.getElementById('expense-count').textContent = 0; // We don't have this data directly
+      document.getElementById('largest-expense').textContent = formatCurrency(0); // We don't have this data directly
+
       // Taxes section
-      document.getElementById('vat-due').textContent = formatCurrency(data.taxes.vat);
-      document.getElementById('income-tax').textContent = formatCurrency(data.taxes.income_tax);
-      document.getElementById('zus-payment').textContent = formatCurrency(data.taxes.zus);
-      
+      const vatDue = data.vat ? data.vat.vat_due : 0;
+      const incomeTax = data.pit ? data.pit.income_tax : 0;
+      const zusTotal = data.zus ? data.zus.total : 0;
+
+      document.getElementById('vat-due').textContent = formatCurrency(vatDue);
+      document.getElementById('income-tax').textContent = formatCurrency(incomeTax);
+      document.getElementById('zus-payment').textContent = formatCurrency(zusTotal);
+
       // Summary section
-      document.getElementById('summary-income').textContent = formatCurrency(data.income.total);
-      document.getElementById('summary-expenses').textContent = formatCurrency(data.expenses.total);
-      document.getElementById('summary-taxes').textContent = formatCurrency(data.taxes.total);
-      document.getElementById('net-profit').textContent = formatCurrency(data.net_profit);
+      const totalTaxes = vatDue + incomeTax + zusTotal;
+      const netProfit = income - expenses - totalTaxes;
+
+      document.getElementById('summary-income').textContent = formatCurrency(income);
+      document.getElementById('summary-expenses').textContent = formatCurrency(expenses);
+      document.getElementById('summary-taxes').textContent = formatCurrency(totalTaxes);
+      document.getElementById('net-profit').textContent = formatCurrency(netProfit);
     }
-    
+
     function formatCurrency(amount) {
       return parseFloat(amount).toFixed(2) + ' PLN';
     }

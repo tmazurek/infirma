@@ -1,0 +1,341 @@
+<div class="dashboard-greeting">
+  <div class="greeting-text">
+    <h1>Szczegóły faktury</h1>
+  </div>
+  <div class="action-buttons">
+    <a href="/invoices" class="action-button">
+      <i class="fas fa-arrow-left"></i> Powrót do listy faktur
+    </a>
+    <button id="download-pdf" class="action-button primary">
+      <i class="fas fa-download"></i> Pobierz PDF
+    </button>
+  </div>
+</div>
+
+<div id="message-container" class="mb-3" style="display: none;"></div>
+
+<div class="card">
+  <div class="card-header">
+    <h2>Faktura <span id="invoice-number"></span></h2>
+    <div class="invoice-status">
+      Status: <span id="invoice-status" class="status-badge"></span>
+    </div>
+  </div>
+  <div class="card-body">
+    <div class="invoice-details">
+      <div class="row">
+        <div class="col-md-6">
+          <h3>Sprzedawca</h3>
+          <div id="seller-details">
+            <p><strong id="company-name"></strong></p>
+            <p>NIP: <span id="company-nip"></span></p>
+            <p id="company-address"></p>
+            <p id="company-city-code"></p>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <h3>Nabywca</h3>
+          <div id="buyer-details">
+            <p><strong id="client-name"></strong></p>
+            <p>NIP: <span id="client-nip"></span></p>
+            <p id="client-address"></p>
+            <p id="client-city-code"></p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="row mt-4">
+        <div class="col-md-4">
+          <p><strong>Data wystawienia:</strong> <span id="issue-date"></span></p>
+        </div>
+        <div class="col-md-4">
+          <p><strong>Termin płatności:</strong> <span id="due-date"></span></p>
+        </div>
+        <div class="col-md-4">
+          <p><strong>Metoda płatności:</strong> <span id="payment-method"></span></p>
+        </div>
+      </div>
+      
+      <div class="mt-4">
+        <h3>Pozycje faktury</h3>
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Lp.</th>
+              <th>Opis</th>
+              <th>Ilość</th>
+              <th>Cena netto</th>
+              <th>Wartość netto</th>
+              <th>VAT (%)</th>
+              <th>Kwota VAT</th>
+              <th>Wartość brutto</th>
+            </tr>
+          </thead>
+          <tbody id="invoice-items">
+            <!-- Invoice items will be added here dynamically -->
+          </tbody>
+          <tfoot>
+            <tr>
+              <td colspan="4" class="text-right"><strong>Razem:</strong></td>
+              <td id="total-net"></td>
+              <td></td>
+              <td id="total-vat"></td>
+              <td id="total-gross"></td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+      
+      <div class="mt-4">
+        <h3>Uwagi</h3>
+        <p id="invoice-notes"></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .row {
+    display: flex;
+    flex-wrap: wrap;
+    margin-right: -15px;
+    margin-left: -15px;
+  }
+  .col-md-4, .col-md-6 {
+    position: relative;
+    width: 100%;
+    padding-right: 15px;
+    padding-left: 15px;
+  }
+  @media (min-width: 768px) {
+    .col-md-4 {
+      flex: 0 0 33.333333%;
+      max-width: 33.333333%;
+    }
+    .col-md-6 {
+      flex: 0 0 50%;
+      max-width: 50%;
+    }
+  }
+  .mt-4 {
+    margin-top: 1.5rem;
+  }
+  .invoice-status {
+    display: flex;
+    align-items: center;
+  }
+  .status-badge {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: bold;
+    margin-left: 8px;
+  }
+  .status-draft {
+    background-color: #ffc107;
+    color: #212529;
+  }
+  .status-issued {
+    background-color: #17a2b8;
+    color: white;
+  }
+  .status-paid {
+    background-color: #28a745;
+    color: white;
+  }
+  .table {
+    width: 100%;
+    margin-bottom: 1rem;
+    color: #212529;
+  }
+  .table th,
+  .table td {
+    padding: 0.75rem;
+    vertical-align: top;
+    border-top: 1px solid #dee2e6;
+  }
+  .table thead th {
+    vertical-align: bottom;
+    border-bottom: 2px solid #dee2e6;
+  }
+  .table tfoot td {
+    border-top: 2px solid #dee2e6;
+    font-weight: bold;
+  }
+  .text-right {
+    text-align: right;
+  }
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Get invoice ID from URL
+    const invoiceId = '<%= invoiceId %>';
+    
+    // Load invoice details
+    loadInvoice(invoiceId);
+    
+    // Add event listener to download button
+    document.getElementById('download-pdf').addEventListener('click', function() {
+      downloadInvoicePdf(invoiceId);
+    });
+    
+    // Functions
+    function loadInvoice(id) {
+      fetch(`/api/invoices/${id}`)
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Failed to fetch invoice details');
+          }
+          return response.json();
+        })
+        .then(invoice => {
+          displayInvoice(invoice);
+        })
+        .catch(error => {
+          showMessage('error', 'Error loading invoice: ' + error.message);
+        });
+    }
+    
+    function displayInvoice(invoice) {
+      // Invoice header
+      document.getElementById('invoice-number').textContent = invoice.invoice_number;
+      
+      // Status badge
+      const statusBadge = document.getElementById('invoice-status');
+      statusBadge.textContent = invoice.status;
+      statusBadge.className = `status-badge status-${invoice.status.toLowerCase()}`;
+      
+      // Format dates
+      const issueDate = new Date(invoice.issue_date).toLocaleDateString();
+      const dueDate = invoice.due_date ? new Date(invoice.due_date).toLocaleDateString() : '-';
+      
+      document.getElementById('issue-date').textContent = issueDate;
+      document.getElementById('due-date').textContent = dueDate;
+      
+      // Payment method
+      const paymentMethods = {
+        'transfer': 'Przelew bankowy',
+        'cash': 'Gotówka',
+        'card': 'Karta płatnicza'
+      };
+      document.getElementById('payment-method').textContent = paymentMethods[invoice.payment_method] || invoice.payment_method;
+      
+      // Notes
+      document.getElementById('invoice-notes').textContent = invoice.notes || 'Brak uwag';
+      
+      // Load company details
+      fetch('/api/company-profile')
+        .then(response => {
+          if (!response.ok) {
+            if (response.status === 404) {
+              return null; // No profile yet
+            }
+            throw new Error('Failed to load company profile');
+          }
+          return response.json();
+        })
+        .then(company => {
+          if (company) {
+            document.getElementById('company-name').textContent = company.company_name || '';
+            document.getElementById('company-nip').textContent = company.nip || '';
+            document.getElementById('company-address').textContent = company.address || '';
+            document.getElementById('company-city-code').textContent = `${company.postal_code || ''} ${company.city || ''}`;
+          }
+        })
+        .catch(error => {
+          console.error('Error loading company profile:', error);
+        });
+      
+      // Load client details
+      fetch(`/api/clients/${invoice.client_id}`)
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Failed to fetch client details');
+          }
+          return response.json();
+        })
+        .then(client => {
+          document.getElementById('client-name').textContent = client.name || '';
+          document.getElementById('client-nip').textContent = client.nip || '';
+          document.getElementById('client-address').textContent = client.address || '';
+          document.getElementById('client-city-code').textContent = `${client.postal_code || ''} ${client.city || ''}`;
+        })
+        .catch(error => {
+          console.error('Error loading client details:', error);
+        });
+      
+      // Load invoice items
+      fetch(`/api/invoices/${invoice.id}/items`)
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Failed to fetch invoice items');
+          }
+          return response.json();
+        })
+        .then(items => {
+          displayInvoiceItems(items);
+          
+          // Display totals
+          document.getElementById('total-net').textContent = invoice.total_net.toFixed(2) + ' PLN';
+          document.getElementById('total-vat').textContent = invoice.total_vat.toFixed(2) + ' PLN';
+          document.getElementById('total-gross').textContent = invoice.total_gross.toFixed(2) + ' PLN';
+        })
+        .catch(error => {
+          console.error('Error loading invoice items:', error);
+        });
+    }
+    
+    function displayInvoiceItems(items) {
+      const itemsContainer = document.getElementById('invoice-items');
+      itemsContainer.innerHTML = '';
+      
+      items.forEach((item, index) => {
+        const row = document.createElement('tr');
+        
+        // Format VAT rate
+        let vatRateDisplay = item.vat_rate + '%';
+        if (item.vat_rate < 0) {
+          vatRateDisplay = 'zw.';
+        }
+        
+        row.innerHTML = `
+          <td>${index + 1}</td>
+          <td>${item.description}</td>
+          <td>${item.quantity}</td>
+          <td>${item.unit_price_net.toFixed(2)} PLN</td>
+          <td>${item.item_total_net.toFixed(2)} PLN</td>
+          <td>${vatRateDisplay}</td>
+          <td>${item.item_total_vat.toFixed(2)} PLN</td>
+          <td>${item.item_total_gross.toFixed(2)} PLN</td>
+        `;
+        
+        itemsContainer.appendChild(row);
+      });
+    }
+    
+    function downloadInvoicePdf(id) {
+      window.location.href = `/api/invoices/${id}/pdf`;
+    }
+    
+    function showMessage(type, message) {
+      const messageContainer = document.getElementById('message-container');
+      
+      messageContainer.innerHTML = `
+        <div class="card mb-3">
+          <div class="card-body ${type === 'error' ? 'text-warning' : 'text-success'}">
+            <i class="fas ${type === 'error' ? 'fa-exclamation-circle' : 'fa-check-circle'}"></i> ${message}
+          </div>
+        </div>
+      `;
+      
+      messageContainer.style.display = 'block';
+      
+      // Auto-hide message after 5 seconds
+      setTimeout(() => {
+        messageContainer.style.display = 'none';
+      }, 5000);
+    }
+  });
+</script>
