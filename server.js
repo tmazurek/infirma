@@ -6,7 +6,7 @@ const ejsLayouts = require('express-ejs-layouts');
 const fetch = require('node-fetch');
 
 // Import database migration script
-const migrateDatabase = require('./utils/migrateDatabase');
+//const migrateDatabase = require('./utils/migrateDatabase');
 
 // Import routes
 const companyProfileRoutes = require('./routes/companyProfile');
