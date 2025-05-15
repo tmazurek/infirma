@@ -17,11 +17,11 @@ router.get('/', (req, res) => {
 
     // Extract ZUS-related fields from company profile
     const zusSettings = {
-      base_amount: profile.zus_base_amount,
+      zus_base_amount: profile.zus_zus_base_amount,
       retirement_rate: profile.zus_retirement_rate,
       disability_rate: profile.zus_disability_rate,
       accident_rate: profile.zus_accident_rate,
-      sickness_rate: profile.zus_sickness_rate,
+      zus_sickness_rate: profile.zus_zus_sickness_rate,
       sickness_optional: profile.zus_sickness_optional,
       health_insurance: profile.zus_health_insurance_amount,
       labor_fund_rate: profile.zus_labor_fund_rate,
@@ -52,11 +52,11 @@ router.post('/', (req, res) => {
     // Update ZUS settings in the profile
     const updatedProfile = {
       ...profile,
-      zus_base_amount: req.body.base_amount,
+      zus_zus_base_amount: req.body.zus_base_amount,
       zus_retirement_rate: req.body.retirement_rate,
       zus_disability_rate: req.body.disability_rate,
       zus_accident_rate: req.body.accident_rate,
-      zus_sickness_rate: req.body.sickness_rate,
+      zus_zus_sickness_rate: req.body.zus_sickness_rate,
       zus_sickness_optional: req.body.sickness_optional,
       zus_health_insurance_amount: req.body.health_insurance,
       zus_labor_fund_rate: req.body.labor_fund_rate,
@@ -74,11 +74,11 @@ router.post('/', (req, res) => {
 
       // Extract ZUS settings from saved profile for response
       const savedZusSettings = {
-        base_amount: savedProfile.zus_base_amount,
+        zus_base_amount: savedProfile.zus_zus_base_amount,
         retirement_rate: savedProfile.zus_retirement_rate,
         disability_rate: savedProfile.zus_disability_rate,
         accident_rate: savedProfile.zus_accident_rate,
-        sickness_rate: savedProfile.zus_sickness_rate,
+        zus_sickness_rate: savedProfile.zus_zus_sickness_rate,
         sickness_optional: savedProfile.zus_sickness_optional,
         health_insurance: savedProfile.zus_health_insurance_amount,
         labor_fund_rate: savedProfile.zus_labor_fund_rate,

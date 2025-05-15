@@ -31,8 +31,8 @@
             <input type="text" id="regon" name="regon">
           </div>
           <div class="form-group">
-            <label for="address">Adres</label>
-            <input type="text" id="address" name="address">
+            <label for="street_address">Adres</label>
+            <input type="text" id="street_address" name="street_address">
           </div>
           <div class="form-group">
             <label for="city">Miasto</label>
@@ -82,9 +82,9 @@
               <p>Skonfiguruj stawki i kwoty składek ZUS (Zakład Ubezpieczeń Społecznych).</p>
 
               <div class="form-group">
-                <label for="base_amount">Podstawa wymiaru składek (PLN)</label>
+                <label for="zus_base_amount">Podstawa wymiaru składek (PLN)</label>
                 <div class="input-group">
-                  <input type="number" id="base_amount" class="form-control" value="5203.80" step="0.01">
+                  <input type="number" id="zus_base_amount" class="form-control" value="5203.80" step="0.01">
                   <button id="reset_base" class="btn btn-sm">Reset</button>
                 </div>
                 <small class="text-muted">Kwota bazowa używana do obliczania składek ZUS (np. 5203.80 PLN dla 2025)</small>
@@ -120,15 +120,15 @@
               </div>
 
               <div class="form-group">
-                <label for="sickness_rate">Ubezpieczenie chorobowe (%)</label>
+                <label for="zus_sickness_rate">Ubezpieczenie chorobowe (%)</label>
                 <div class="input-group">
-                  <input type="number" id="sickness_rate" class="form-control" value="2.45" step="0.01">
+                  <input type="number" id="zus_sickness_rate" class="form-control" value="2.45" step="0.01">
                   <button id="reset_sickness" class="btn btn-sm">Reset</button>
                 </div>
                 <small class="text-muted">Domyślnie: 2.45% (Dobrowolne)</small>
                 <div class="form-check">
-                  <input type="checkbox" id="sickness_optional" class="form-check-input" checked>
-                  <label for="sickness_optional" class="form-check-label">Uwzględnij ubezpieczenie chorobowe</label>
+                  <input type="checkbox" id="zus_sickness_optional" class="form-check-input" checked>
+                  <label for="zus_sickness_optional" class="form-check-label">Uwzględnij ubezpieczenie chorobowe</label>
                 </div>
               </div>
 
@@ -245,12 +245,12 @@
 
     // ZUS calculations
     function calculateZUS() {
-      const baseAmount = parseFloat(document.getElementById('base_amount').value) || 0;
+      const baseAmount = parseFloat(document.getElementById('zus_base_amount').value) || 0;
       const retirementRate = parseFloat(document.getElementById('retirement_rate').value) / 100 || 0;
       const disabilityRate = parseFloat(document.getElementById('disability_rate').value) / 100 || 0;
       const accidentRate = parseFloat(document.getElementById('accident_rate').value) / 100 || 0;
-      const sicknessRate = document.getElementById('sickness_optional').checked ?
-                          (parseFloat(document.getElementById('sickness_rate').value) / 100 || 0) : 0;
+      const sicknessRate = document.getElementById('zus_sickness_optional').checked ?
+                          (parseFloat(document.getElementById('zus_sickness_rate').value) / 100 || 0) : 0;
       const healthInsurance = parseFloat(document.getElementById('health_insurance').value) || 0;
       const laborFundRate = parseFloat(document.getElementById('labor_fund_rate').value) / 100 || 0;
       const fepRate = document.getElementById('fep_optional').checked ?
@@ -289,7 +289,7 @@
 
     // Reset buttons
     document.getElementById('reset_base').addEventListener('click', function() {
-      document.getElementById('base_amount').value = '5203.80';
+      document.getElementById('zus_base_amount').value = '5203.80';
       calculateZUS();
     });
 
@@ -309,7 +309,7 @@
     });
 
     document.getElementById('reset_sickness').addEventListener('click', function() {
-      document.getElementById('sickness_rate').value = '2.45';
+      document.getElementById('zus_sickness_rate').value = '2.45';
       calculateZUS();
     });
 
@@ -378,7 +378,7 @@
         if (data.company) {
           document.getElementById('company_name').value = data.company.name || '';
           document.getElementById('regon').value = data.company.regon || '';
-          document.getElementById('address').value = data.company.street || '';
+          document.getElementById('street_address').value = data.company.street || '';
           document.getElementById('city').value = data.company.city || '';
           document.getElementById('postal_code').value = data.company.postalCode || '';
         } else {
@@ -393,12 +393,12 @@
     // Save ZUS settings
     document.getElementById('save_zus_settings').addEventListener('click', function() {
       const zusSettings = {
-        base_amount: parseFloat(document.getElementById('base_amount').value),
+        zus_base_amount: parseFloat(document.getElementById('zus_base_amount').value),
         retirement_rate: parseFloat(document.getElementById('retirement_rate').value),
         disability_rate: parseFloat(document.getElementById('disability_rate').value),
         accident_rate: parseFloat(document.getElementById('accident_rate').value),
-        sickness_rate: parseFloat(document.getElementById('sickness_rate').value),
-        sickness_optional: document.getElementById('sickness_optional').checked,
+        zus_sickness_rate: parseFloat(document.getElementById('zus_sickness_rate').value),
+        zus_sickness_optional: document.getElementById('zus_sickness_optional').checked,
         health_insurance: parseFloat(document.getElementById('health_insurance').value),
         labor_fund_rate: parseFloat(document.getElementById('labor_fund_rate').value),
         fep_rate: parseFloat(document.getElementById('fep_rate').value),
@@ -442,7 +442,7 @@
         document.getElementById('company_name').value = data.company_name || '';
         document.getElementById('nip').value = data.nip || '';
         document.getElementById('regon').value = data.regon || '';
-        document.getElementById('address').value = data.address || '';
+        document.getElementById('street_address').value = data.street_address || '';
         document.getElementById('city').value = data.city || '';
         document.getElementById('postal_code').value = data.postal_code || '';
         document.getElementById('email').value = data.email || '';
@@ -469,16 +469,16 @@
     })
     .then(data => {
       if (data) {
-        document.getElementById('base_amount').value = data.base_amount || '5203.80';
-        document.getElementById('retirement_rate').value = data.retirement_rate || '19.52';
-        document.getElementById('disability_rate').value = data.disability_rate || '8.00';
-        document.getElementById('accident_rate').value = data.accident_rate || '1.67';
-        document.getElementById('sickness_rate').value = data.sickness_rate || '2.45';
-        document.getElementById('sickness_optional').checked = data.sickness_optional !== false;
-        document.getElementById('health_insurance').value = data.health_insurance || '461.66';
-        document.getElementById('labor_fund_rate').value = data.labor_fund_rate || '2.45';
-        document.getElementById('fep_rate').value = data.fep_rate || '0.00';
-        document.getElementById('fep_optional').checked = data.fep_optional === true;
+        document.getElementById('zus_base_amount').value = data.zus_base_amount ;
+        document.getElementById('retirement_rate').value = data.retirement_rate ;
+        document.getElementById('disability_rate').value = data.disability_rate ;
+        document.getElementById('accident_rate').value = data.accident_rate ;
+        document.getElementById('zus_sickness_rate').value = data.zus_sickness_rate ;
+        document.getElementById('zus_sickness_optional').checked = data.zus_sickness_optional ;
+        document.getElementById('health_insurance').value = data.health_insurance ;
+        document.getElementById('labor_fund_rate').value = data.labor_fund_rate ;
+        document.getElementById('fep_rate').value = data.fep_rate ;
+        document.getElementById('fep_optional').checked = data.fep_optional ;
 
         calculateZUS();
       }
